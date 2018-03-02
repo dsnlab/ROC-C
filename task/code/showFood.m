@@ -20,14 +20,14 @@ end
 % Display fixation 
 %DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
 %TrialStart = Screen(PTBParams.win,'Flip');
-TrialStart=WaitSecs(2);
+trialStart=GetSecs;
 
 % Display food
-foodCoords = findPicLoc(size(foodJpg{Food(trial)}),[.5,.45],PTBParams,'ScreenPct',.55);
-FoodScreen = Screen('MakeTexture',PTBParams.win,foodJpg{Food(trial)});
+foodCoords = findPicLoc(size(foodJpg{foodTrial}),[.5,.45],PTBParams,'ScreenPct',.55);
+FoodScreen = Screen('MakeTexture',PTBParams.win,foodJpg{foodTrial});
 Screen('DrawTexture',PTBParams.win,FoodScreen,[],foodCoords);
-Screen('FrameRect', PTBParams.win, color, foodCoords, 5);
-FoodOn = Screen(PTBParams.win,'Flip', TrialStart+ISI); 
+Screen('FrameRect', PTBParams.win, color, foodCoords, 10);
+FoodOn = Screen(PTBParams.win,'Flip', trialStart+ISI); 
 
 % Display rating prompt after time specified in WaitTime
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
@@ -36,20 +36,20 @@ Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'no desire',.75*posPress1_x,posPress_y,PTBParams.white);
 DrawFormattedText(PTBParams.win,'strong desire',.95*posPress2_x,posPress_y,PTBParams.white);
 DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
-RatingOn = Screen(PTBParams.win,'Flip',FoodOn+WaitTime);
+ratingOn = Screen(PTBParams.win,'Flip',FoodOn+WaitTime);
 Screen('Close',FoodScreen);
 
 % Log trial info
-FoodPic = jpgs(Food(trial));
-FoodNum = Food(trial);
-FoodOnset = FoodOn-StartTime;
-RatingOnset = RatingOn-StartTime;
-FoodDuration = RatingOnset-FoodOnset;
-Cond = trialOrder(trial);
-LikingRating = ratings(find(strcmp(FoodPic, images)));
-if sum(strcmp(char(FoodPic),eval(sprintf('%s_craved',runNum)))) == 1
-    Craved = 1;
+foodPic = char(jpgs(foodTrial));
+foodNum = foodTrial;
+foodOnset = FoodOn-StartTime;
+ratingOnset = ratingOn-StartTime;
+foodDuration = ratingOnset-foodOnset;
+cond = char(trialOrder(trial));
+likingRating = ratings(find(strcmp(foodPic, images)));
+if sum(strcmp(char(foodPic),eval(sprintf('%s_craved',runNum)))) == 1
+    craved = 1;
 else
-    Craved = 0;
+    craved = 0;
 end
 
