@@ -1,4 +1,4 @@
-%% Regulation of Craving task %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Regulation of Craving task %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Dani Cosme
 % Last Modified: 03-01-2018
@@ -142,9 +142,12 @@ posNum_y = 2*PTBParams.rect(4)/3.5;
 posRate1_x = PTBParams.rect(3)/8;
 posRate2_x = 5.4*PTBParams.rect(3)/8;
 
-% define trial and cue wait time
-trial=1;
-cueWait=2;
+% define trial and wait times
+trial = 1;
+cueWait = 2;
+fixWait = 4;
+previewWait = 2;
+foodWait = 5; 
 
 % Run task
 for block = 1:length(blockOrder)
@@ -188,7 +191,7 @@ for block = 1:length(blockOrder)
     Screen('DrawTexture',PTBParams.win,FoodScreen3,[],foodCoords3);
     PreviewOn = Screen(PTBParams.win,'Flip'); 
     previewOnset = PreviewOn-StartTime;
-    WaitSecs(3);
+    WaitSecs(previewWait);
 
     % Draw block cue
     Screen(PTBParams.win,'TextSize',round(.4*PTBParams.ctr(2)));
@@ -206,6 +209,12 @@ for block = 1:length(blockOrder)
     end
     blockOnset = BlockOn-StartTime;
     
+    % Draw fixation
+    DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+    fixOn = Screen(PTBParams.win,'Flip');
+    WaitSecs(fixWait);
+    
+    % Run trials within block
     for blockTrial = 1:blockSize %num trials
         foodTrial = foodRand(blockTrial); 
         showFood
@@ -253,12 +262,10 @@ for block = 1:length(blockOrder)
     end
 end
 
-% Wait for 6 seconds and log end time
+% Wait for 2s
 WaitSecs(2);
-EndTime = GetSecs-StartTime;
-logData(datafile,runNum,1, EndTime);
 
-% 
+% Show run rummary for 4s and log endtime
 load(datafile)
 idxs = find(strcmp(Data.(char(runNum)).cond, 'CHOOSE'));
 nLook = sum(strcmp(Data.(char(runNum)).respCue(idxs), '1'))/blockSize;
@@ -266,7 +273,7 @@ nRegulate = sum(strcmp(Data.(char(runNum)).respCue(idxs), '2'))/blockSize;
 posPress2_x = 5.35*PTBParams.rect(3)/8;
 
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'Run summary:','center',posCue_y,PTBParams.white);
+DrawFormattedText(PTBParams.win,'Run summary for choose trials:','center',posCue_y,PTBParams.white);
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
 DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
@@ -274,6 +281,9 @@ DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red)
 DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
+
+EndTime = GetSecs-StartTime;
+logData(datafile,runNum,1, EndTime);
 
 % Task complete
 DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PTBParams.white);
