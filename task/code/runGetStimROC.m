@@ -12,7 +12,7 @@
 
 %% Housecleaning before the guests arrive
 pathtofile = mfilename('fullpath');
-homepath = pathtofile(1:(regexp(pathtofile,'runGetStim') - 1));
+homepath = pathtofile(1:(regexp(pathtofile,'code/runGetStim') - 1));
 addpath(homepath);
 
 cd(homepath);
@@ -64,12 +64,12 @@ end
 
 %% Create run directories and remove old images and unnecessary run directories
 % Remove current images from run directories
-nrundirs = numel(dir(sprintf('%sfoodpics/run*',homepath)));
+nrundirs = numel(dir(sprintf('%sstimuli/run*',homepath)));
 for i = 1:nrundirs
-    rundir = dir(fullfile(sprintf('%sfoodpics/run%d', homepath, i)));
+    rundir = dir(fullfile(sprintf('%sstimuli/run%d', homepath, i)));
     if numel(rundir) > 2
         disp(sprintf('Removing files from run directory %d',i))
-        delete(sprintf('%sfoodpics/run%d/*.bmp', homepath, i));
+        delete(sprintf('%sstimuli/run%d/*.jpg', homepath, i));
     end
 end
 
@@ -77,14 +77,14 @@ end
 for i = 1:nrundirs
     if i > nruns
         disp(sprintf('Removing unnecessary run directory %d',i))
-        rundir = (sprintf('%sfoodpics/run%d', homepath, i));
+        rundir = (sprintf('%sstimuli/run%d', homepath, i));
         rmdir(rundir)
     end
 end
 
 % Create directories if they do not exist
 for i = 1:nruns
-    rundir = fullfile(sprintf('%sfoodpics/run%d', homepath, i));
+    rundir = fullfile(sprintf('%sstimuli/run%d', homepath, i));
     if ~exist(rundir)
         disp(sprintf('Run directory %d did not exist. Creating it now',i))
         mkdir(rundir);
@@ -193,7 +193,7 @@ duplicates = b(not(ismember(1:numel(b),i)));
 
 if ~isempty(duplicates)
     disp(sort(b));
-    error('Duplicate files found. Please check ensure there are enough healthy stimuli available.');
+    error('Duplicate files found. Please check ensure there are enough stimuli available.');
 end
 
 %% Get ratings for selected images
