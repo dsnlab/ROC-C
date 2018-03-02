@@ -133,12 +133,14 @@ logData(datafile,runNum,1,StartTime,Jitter);
 
 % Define text positions
 posCue_y = PTBParams.rect(4)/3;
-posPress1_x = PTBParams.rect(3)/8;
-posPress2_x = 5.4*PTBParams.rect(3)/8;
+posPress1_x = 1.1*PTBParams.rect(3)/8;
+posPress2_x = 5.75*PTBParams.rect(3)/8;
 posPress_y = 2*PTBParams.rect(4)/3.5;
 posNum1_x = posPress1_x+(PTBParams.rect(3)/16);
-posNum2_x = posPress2_x+(PTBParams.rect(3)/16);
+posNum2_x = posPress2_x+(PTBParams.rect(3)/14);
 posNum_y = 2*PTBParams.rect(4)/3.5;
+posRate1_x = PTBParams.rect(3)/8;
+posRate2_x = 5.4*PTBParams.rect(3)/8;
 
 % define trial and cue wait time
 trial=1;
@@ -153,21 +155,21 @@ for block = 1:length(blockOrder)
         numText2 = 'REGULATE';
         num1 = '\n\n1';
         num2 = '\n\n2';
-        posPress2_x = 4.85*PTBParams.rect(3)/8;
+        posPress2_x = 5.35*PTBParams.rect(3)/8;
     elseif strcmp(cue,'REGULATE')
         color = PTBParams.red;
         numText1 = '';
         numText2 = 'PRESS';
         num1 = '';
         num2 = '\n\n2';
-        posPress2_x = 5.4*PTBParams.rect(3)/8;
+        posPress2_x = 5.75*PTBParams.rect(3)/8;
     else
         color = PTBParams.green;
         numText1 = 'PRESS';
         numText2 = '';
         num1 = '\n\n1';
         num2 = '';
-        posPress2_x = 5.4*PTBParams.rect(3)/8;
+        posPress2_x = 5.75*PTBParams.rect(3)/8;
     end
     
     % Randomize trial images within block
@@ -218,8 +220,8 @@ for block = 1:length(blockOrder)
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
         DrawFormattedText(PTBParams.win,'How hard was it to look or regulate?','center',posCue_y,PTBParams.white);
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-        DrawFormattedText(PTBParams.win,'not hard',.75*posPress1_x,posPress_y,PTBParams.white);
-        DrawFormattedText(PTBParams.win,'very hard',1.05*posPress2_x,posPress_y,PTBParams.white);
+        DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.teal  );
+        DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
         DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
         ratingOff = Screen(PTBParams.win,'Flip');
         ratingOffset = ratingOff-StartTime;
