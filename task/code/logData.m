@@ -47,7 +47,7 @@ for VAR = 1:(nargin - 3)
         
         % USAGE 1
         structureName = sprintf('Data.%s.',runNum);
-        eval([structureName inputname(VAR + 3) '{' num2str(trial) '} = varargin{' ...
+        eval([structureName inputname(VAR + 3) '{' num2str(trial) ',1} = varargin{' ...
             num2str(VAR) '};']);
         
     else
