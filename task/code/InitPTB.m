@@ -1,4 +1,4 @@
-function [PTBParams, runNum, study] = InitPTB(homepath)
+function [PTBParams, runNum, study, homepath] = InitPTB(homepath)
 % function [subjid ssnid datafile PTBParams] = InitPTB(homepath)
 % 
 % Function for initializing parameters at the beginning of a session
@@ -84,8 +84,8 @@ HideCursor; %comment out for testing only
 screenNum=0;
 
 % Set screen size and parameters
-%[w, rect] = Screen('OpenWindow',screenNum);
-[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 600 400]); %DCos 2015.06.25, Use for debugging
+[w, rect] = Screen('OpenWindow',screenNum);
+%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
 
 ctr = [rect(3)/2, rect(4)/2]; 
 white=WhiteIndex(w);
