@@ -254,10 +254,28 @@ for block = 1:length(blockOrder)
 end
 
 % Wait for 6 seconds and log end time
-WaitSecs(6);
+WaitSecs(2);
 EndTime = GetSecs-StartTime;
 logData(datafile,runNum,1, EndTime);
 
+% 
+load(datafile)
+idxs = find(strcmp(Data.(char(runNum)).cond, 'CHOOSE'));
+nLook = sum(strcmp(Data.(char(runNum)).respCue(idxs), '1'))/blockSize;
+nRegulate = sum(strcmp(Data.(char(runNum)).respCue(idxs), '2'))/blockSize;
+posPress2_x = 5.35*PTBParams.rect(3)/8;
+
+Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+DrawFormattedText(PTBParams.win,'Run summary:','center',posCue_y,PTBParams.white);
+Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
+DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
+DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red);
+DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
+Screen(PTBParams.win,'Flip'); 
+WaitSecs(4);
+
+% Task complete
 DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PTBParams.white);
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
@@ -274,7 +292,6 @@ subCode = sprintf('FP%d',PTBParams.subjid);
 subDir = fullfile(dropboxDir,subCode);
 outputFile = fullfile(homepath,'output',subCode,sprintf('%s_%s.csv',subCode,runNum));
 
-load(datafile)
 toWrite = struct2table(rmfield(Data.(char(runNum)),{'time','StartTime','Jitter','EndTime'}));
 writetable(toWrite, outputFile, 'WriteVariableNames', true);
 
