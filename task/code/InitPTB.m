@@ -1,6 +1,4 @@
 function [PTBParams, runNum, study, homepath] = InitPTB(homepath)
-% function [subjid ssnid datafile PTBParams] = InitPTB(homepath)
-% 
 % Function for initializing parameters at the beginning of a session
 %
 % homepath: Path name to scripts directory for the study
@@ -88,28 +86,20 @@ screenNum=0;
 %[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
 
 ctr = [rect(3)/2, rect(4)/2]; 
-white=WhiteIndex(w);
-black=BlackIndex(w);
-yellow = [240 189 0];
-green=[142 166 4];
-red = [252 3 8];
-blue = [0 161 228];
-teal = [77 161 169];
-gray = (WhiteIndex(w) + BlackIndex(w))/2;
 ifi = Screen('GetFlipInterval', w);
 
 % Save parameters in PTBParams structure
 PTBParams.win = w;
 PTBParams.rect = rect;
 PTBParams.ctr = ctr;
-PTBParams.white = white;
-PTBParams.black = black;
-PTBParams.yellow = yellow;
-PTBParams.green = green;
-PTBParams.blue = blue;
-PTBParams.teal = teal;
-PTBParams.red = red;
-PTBParams.gray = gray;
+PTBParams.white = WhiteIndex(w);
+PTBParams.black = BlackIndex(w);
+PTBParams.yellow = [240 189 0];
+PTBParams.green = [142 166 4];
+PTBParams.blue = [0 161 228];
+PTBParams.teal = [77 161 169];
+PTBParams.red = [252 3 8];
+PTBParams.gray = (WhiteIndex(w) + BlackIndex(w))/2;
 PTBParams.ifi = ifi;
 PTBParams.datafile = datafile;
 PTBParams.homepath = homepath;
@@ -126,7 +116,7 @@ save(datafile,'PTBParams');
 % Flip screen
 Screen(w,'TextSize',round(.2*ctr(2)));
 Screen('TextFont',w,'Futura');
-Screen('FillRect',w,black);
+Screen('FillRect',w,PTBParams.black);
 
 % Used to initialize mousetracking object, otherwise the first time
 % this is called elsewhere it can take up to 300ms, throwing off timing
