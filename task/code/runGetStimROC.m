@@ -38,10 +38,10 @@ ntrials = 30;
 
 %% Load image info
 % Define dropbox path
-dxpath = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ImageSelection/output'; % check this
+ratingspath = fullfile(homepath,'ratings');
 
 % Define subject input file
-subinput = sprintf('%s/%s%s_ratings.csv',dxpath,study,subjid);
+subinput = sprintf('%s/%s%s_ratings.csv',ratingspath,study,subjid);
 
 % Load image rating info
 if exist(subinput)
