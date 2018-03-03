@@ -145,8 +145,8 @@ posRate2_x = 5.4*PTBParams.rect(3)/8;
 % define trial and wait times
 trial = 1;
 cueWait = 2;
-fixWait = 4;
-previewWait = 2;
+fixWait = 2;
+previewWait = 2;11
 foodWait = 5; 
 
 % Run task
@@ -201,19 +201,21 @@ for block = 1:length(blockOrder)
     DrawFormattedText(PTBParams.win,num1,posNum1_x,posNum_y,PTBParams.white);
     DrawFormattedText(PTBParams.win,numText2,posPress2_x,posPress_y,PTBParams.white);
     DrawFormattedText(PTBParams.win,num2,posNum2_x,posNum_y,PTBParams.white);
-    BlockOn = Screen(PTBParams.win,'Flip');
+    cueOn = Screen(PTBParams.win,'Flip');
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
         [respCue, rtCue] = collectResponse(cueWait,0,'56');
     else
         [respCue, rtCue] = collectResponse(cueWait,0,'12'); %Changing the first argument changes the time the bid is on the screen
     end
-    blockOnset = BlockOn-StartTime;
+    cueOnset = cueOn-StartTime;
+    previewDuration = (cueOn-StartTime)-previewOnset;
     
     % Draw fixation
     DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
     fixOn = Screen(PTBParams.win,'Flip');
     WaitSecs(fixWait);
-    
+    cueDuration = (fixOn-StartTime)-cueOnset;
+        
     % Run trials within block
     for blockTrial = 1:blockSize %num trials
         foodTrial = foodRand(blockTrial); 
@@ -249,11 +251,11 @@ for block = 1:length(blockOrder)
         effortDuration = effortOffset-ratingOffset;
         
         % Log data in .mat file
-        logData(datafile,runNum,trial,previewOnset,blockOnset, ...
+        logData(datafile,runNum,trial, ...
             trialStart,ISI, ...
             foodPic,foodNum,cond,likingRating, ...
-            foodOnset,ratingOnset,effortOnset, ...
-            foodDuration,ratingDuration,effortDuration, ...
+            previewOnset,cueOnset,foodOnset,ratingOnset,effortOnset, ...
+            previewDuration,cueDuration,foodDuration,ratingDuration,effortDuration, ...
             respCue,respRating,respEffort, ...
             rtCue,rtRating,rtEffort);
         
