@@ -9,8 +9,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Run script for each trial
-% Specify food image and fixation presentation lengths
-WaitTime = 5; %Specifies how long to wait before rating screen appears
+% Specify food image
 if PTBParams.inMRI == 1
     ISI = Jitter(trial)+3;
 else
@@ -36,7 +35,7 @@ Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'no desire',.65*posRate1_x,posPress_y,PTBParams.blue);
 DrawFormattedText(PTBParams.win,'strong desire',.97*posRate2_x,posPress_y,PTBParams.blue);
 DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
-ratingOn = Screen(PTBParams.win,'Flip',FoodOn+WaitTime);
+ratingOn = Screen(PTBParams.win,'Flip',FoodOn+foodWait);
 Screen('Close',FoodScreen);
 
 % Log trial info
