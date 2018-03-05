@@ -27,11 +27,11 @@ dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
 %% Load trial and subject condition info
 % Load trial condition order info (design created using the CAN lab GA)
 % https://github.com/UOSAN/CanLabCore_GA/tree/master/SAN_GAs/DEV
-%% UPDATE %%%%%%%%%%%%%%%%%%%%
+%% UPDATE FOR MRI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 order = [repelem({'LOOK', 'REGULATE'}, 2), repelem({'CHOOSE'},6)];
 blockOrder = order(randperm(length(order)));
 trialOrder = repelem(blockOrder, 3);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load subject condition info
 subInput = sprintf('%sinput/%s%d_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
@@ -103,7 +103,7 @@ Food = 1:length(trialOrder);
 if PTBParams.inMRI
     load(fullfile(homepath,'input','jitter.mat'))
 else
-    Jitter = ones(length(trialOrder),1);
+    Jitter = repelem(2,length(trialOrder)); %2s fixation for behavioral sessions
 end
 
 % Check to make sure the number of trials and jitter is the same
@@ -146,7 +146,7 @@ posRate2_x = 5.4*PTBParams.rect(3)/8;
 trial = 1;
 cueWait = 2;
 fixWait = 2;
-previewWait = 2;11
+previewWait = 2;
 foodWait = 5; 
 
 % Run task
@@ -205,15 +205,31 @@ for block = 1:length(blockOrder)
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
         [respCue, rtCue] = collectResponse(cueWait,0,'56');
     else
-        [respCue, rtCue] = collectResponse(cueWait,0,'12'); %Changing the first argument changes the time the bid is on the screen
+        [respCue, rtCue] = collectResponse(cueWait,0,'12');
     end
     cueOnset = cueOn-StartTime;
     previewDuration = (cueOn-StartTime)-previewOnset;
     
-    % Draw fixation
+    % Draw fixation and collect responses that occur after cue period
     DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
     fixOn = Screen(PTBParams.win,'Flip');
-    WaitSecs(fixWait);
+    fixOnset = fixOn-StartTime;
+    if strcmp(respCue, 'NULL')
+        if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
+            [respCue, rtCue] = collectResponse(fixWait,0,'56');
+        else
+            [respCue, rtCue] = collectResponse(fixWait,0,'12');
+        end
+    end
+    
+    % Change color for choose trials based on selection
+    if strcmp(cue,'CHOOSE') && strcmp(respCue,'1')
+        color = PTBParams.green;
+    elseif strcmp(cue,'CHOOSE') && strcmp(respCue,'2')
+        color = PTBParams.red;
+    else
+        color = color;
+    end
     cueDuration = (fixOn-StartTime)-cueOnset;
         
     % Run trials within block
@@ -229,7 +245,7 @@ for block = 1:length(blockOrder)
  
         % Draw effort ratings
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-        DrawFormattedText(PTBParams.win,'How hard was it to look or regulate?','center',posCue_y,PTBParams.white);
+        DrawFormattedText(PTBParams.win,'How hard?','center',posCue_y,PTBParams.white);
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
         DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.teal  );
         DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
@@ -251,12 +267,11 @@ for block = 1:length(blockOrder)
         effortDuration = effortOffset-ratingOffset;
         
         % Log data in .mat file
-        logData(datafile,runNum,trial, ...
-            trialStart,ISI, ...
+        logData(datafile,runNum,trial,ISI, ...
             foodPic,foodNum,cond,likingRating, ...
             previewOnset,cueOnset,foodOnset,ratingOnset,effortOnset, ...
             previewDuration,cueDuration,foodDuration,ratingDuration,effortDuration, ...
-            respCue,respRating,respEffort, ...
+            respCue,respRating,respEffort, ...Change 
             rtCue,rtRating,rtEffort);
         
         % Update trial number
@@ -285,7 +300,7 @@ Screen(PTBParams.win,'Flip');
 WaitSecs(4);
 
 EndTime = GetSecs-StartTime;
-logData(datafile,runNum,1, EndTime);
+logData(datafile,runNum,1,EndTime);
 
 % Task complete
 DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PTBParams.white);
@@ -304,6 +319,7 @@ subCode = sprintf('FP%d',PTBParams.subjid);
 subDir = fullfile(dropboxDir,subCode);
 outputFile = fullfile(homepath,'output',subCode,sprintf('%s_%s.csv',subCode,runNum));
 
+load(datafile)
 toWrite = struct2table(rmfield(Data.(char(runNum)),{'time','StartTime','Jitter','EndTime'}));
 writetable(toWrite, outputFile, 'WriteVariableNames', true);
 

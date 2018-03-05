@@ -20,7 +20,6 @@ function [Resp, RT] = collectResponse(varargin)
 ListenTime = Inf;
 moveOn = 1;
 allowedKeys = [];
-
 if length(varargin) >= 1
     ListenTime = varargin{1};
 end
