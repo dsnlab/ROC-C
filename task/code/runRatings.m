@@ -299,7 +299,6 @@ sca
 tiers = cell2mat(ImgRatings_sorted(:,2));
 ratings = cell2mat(ImgRatings_sorted(:,1));
 cravedIdx = (tiers > 0) & (ratings > 0); % only select images from craved categories
-save current
 if sum(cravedIdx) < minCravedImages
     error('Only %d usable images!',sum(cravedIdx))
 end
