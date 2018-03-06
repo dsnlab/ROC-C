@@ -309,7 +309,7 @@ end
 function [ rects,mids ] = DrawRectsGrid(wRect, XCENTER)
 %DrawRectGrid:  Builds a grid of squares with gaps in between.
 
-global wRect XCENTER
+%global wRect XCENTER
 
 %Size of image will depend on screen size. First, an area approximately 80%
 %of screen is determined. Then, images are 1/4th the side of that square
@@ -342,7 +342,7 @@ end
 %%
 function drawRatings(w,KEYS,COLORS,rects,mids,varargin)
 
-global w KEYS COLORS rects mids
+%global w KEYS COLORS rects mids
 
 maxRating = 4;
 num_rects = 8;
