@@ -320,7 +320,7 @@ if ~exist('sprout')
 end
 
 %% Save as .csv and copy files to dropbox
-subCode = sprintf('FP%d',PTBParams.subjid);
+subCode = sprintf('%s%d',study,PTBParams.subjid);
 subDir = fullfile(dropboxDir,subCode);
 outputFile = fullfile(homepath,'output',subCode,sprintf('%s_%s.csv',subCode,runNum));
 
