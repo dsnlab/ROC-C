@@ -307,6 +307,11 @@ DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PT
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
 
+%% Print run summary to command window
+disp('------------------------------');
+disp(sprintf('Number of look trials = %d', nLook));
+disp(sprintf('Number of regulate trials = %d', nRegulate));
+disp('------------------------------');
 %% Close screen
 if ~exist('sprout')
     % Housekeeping after the party
