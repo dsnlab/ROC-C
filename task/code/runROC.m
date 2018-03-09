@@ -100,7 +100,7 @@ end
 Food = 1:length(trialOrder);
 
 %% Load jitter
-if PTBParams.inMRI
+if PTBParams.inMRI == 1
     load(fullfile(homepath,'input','jitter.mat'))
 else
     Jitter = repelem(2,length(trialOrder)); %2s fixation for behavioral sessions

@@ -12,16 +12,33 @@ cd(homepath);
 clear all; close all; Screen('CloseAll'); 
 homepath = [pwd '/'];
 
-%% Get study and subject info 
+%% Get study and subject info and whether MRI or behavioral session
 % Check to make sure aren't about to overwrite duplicate session!
 checksubjid = 1;
 while checksubjid == 1
-    study = 'FP'; %removed user input for convenience
-    subjid = input('Subject number (3 digits):  ', 's');
     ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
-    runid = input('Run number (1-3):  ');
 
-    if runid == 1 && (exist(fullfile(homepath, 'SubjectData', [study subjid], [study,'.',subjid,'.',ssnid,'.mat']),'file') == 2)
+    % set prompt info and default answers
+    prompt={'Study code'; 'Subject number (3 digits)'; 'Run number (1-3)'; 'MRI session? (0 = no, 1 = yes)'};
+    name='Subject Info';
+    defAns={''; '999'; ''; ''};
+    options.WindowStyle = 'normal';
+
+    % open dialog box
+    % To change the default font size, you need to edit this directly in the
+    % inputdlg function by typing: edit inputdlg.m
+    % TextInfo.FontSize = get(0,'FactoryUicontrolFontSize') -->
+    % TextInfo.FontSize = 14
+
+    answer=inputdlg(prompt,name,1,defAns,options);
+
+    % name variables from inputs
+    study=answer{1};
+    subjid=answer{2};
+    runid = str2double(answer{3});
+    inMRI = str2double(answer{4});
+
+    if runid == 1 && (exist(fullfile(homepath, 'output', [study subjid], [study,'.',subjid,'.',ssnid,'.mat']),'file') == 2)
         cont = input('WARNING: Datafile already exists!  Overwrite? (y/n)  ','s');
         if cont == 'y'
             checksubjid = 0;
@@ -32,15 +49,6 @@ while checksubjid == 1
         checksubjid = 0;
     end
 end   
-
-% Set defaults for subject number and session
-if isempty(subjid)
-    subjid = '999';
-end
-
-if isempty(ssnid)
-    ssnid = '1';
-end
 
 % Create name of datafile where data will be stored    
 if ~exist([homepath 'output/' study subjid],'dir')
@@ -60,14 +68,6 @@ Data.ssnid = ssnid;
 Data.(char(runNum)).time = datestr(now);
 
 save(datafile,'Data');
-
-%% Initialize parameters for fMRI
-inMRI = input('MRI session? 1 = yes, 0 = no: ');
-
-% if no input, default = not in MRI
-if isempty(inMRI)
-    inMRI = 0;
-end
 
 %% Initialize PsychToolbox parameters and save in PTBParams struct
 AssertOpenGL;

@@ -94,7 +94,7 @@ end
 Food = 1:length(trialOrder);
 
 %% Load jitter
-if PTBParams.inMRI
+if PTBParams.inMRI == 1
     load(fullfile(homepath,'input','jitter.mat'))
     Jitter(Jitter(1:length(trialOrder)))
 else

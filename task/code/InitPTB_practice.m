@@ -12,28 +12,27 @@ cd(homepath);
 clear all; close all; Screen('CloseAll'); 
 homepath = [pwd '/'];
 
-%% Get study and subject info 
-% Check to make sure aren't about to overwrite duplicate session!
-study = 'FP'; %removed user input for convenience
-subjid = input('Subject number (3 digits):  ', 's');
+%% Get study and subject info and whether MRI or behavioral session
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
 
-% Set defaults for subject number and session
-if isempty(subjid)
-    subjid = '999';
-end
+% set prompt info and default answers
+prompt={'Study code'; 'Subject number (3 digits)'; 'MRI session? (0 = no, 1 = yes)'};
+name='Subject Info';
+defAns={''; '999'; ''};
+options.WindowStyle = 'normal';
 
-if isempty(ssnid)
-    ssnid = '1';
-end
+% open dialog box
+% To change the default font size, you need to edit this directly in the
+% inputdlg function by typing: edit inputdlg.m
+% TextInfo.FontSize = get(0,'FactoryUicontrolFontSize') -->
+% TextInfo.FontSize = 14
 
-%% Initialize parameters for fMRI
-inMRI = input('MRI session? 0 = no, 1 = yes: ');
+answer=inputdlg(prompt,name,1,defAns,options);
 
-% if no input, default = not in MRI
-if isempty(inMRI)
-    inMRI = 0;
-end
+% name variables from inputs
+study=answer{1};
+subjid=answer{2};
+inMRI = str2double(answer{3});
 
 %% Initialize PsychToolbox parameters and save in PTBParams struct
 AssertOpenGL;

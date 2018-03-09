@@ -24,9 +24,25 @@ rng('default')
 rng('shuffle')
 
 %% Get study, subject id, and session number from user
-study = 'FP'; %removed user input for convenience 
-subjid = input('Subject number (3 digits):  ', 's');
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
+
+% set prompt info and default answers
+prompt={'Study code'; 'Subject number (3 digits)'};
+name='Subject Info';
+defAns={''; '999'};
+options.WindowStyle = 'normal';
+
+% open dialog box
+% To change the default font size, you need to edit this directly in the
+% inputdlg function by typing: edit inputdlg.m
+% TextInfo.FontSize = get(0,'FactoryUicontrolFontSize') -->
+% TextInfo.FontSize = 14
+
+answer=inputdlg(prompt,name,1,defAns,options);
+
+% name variables from inputs
+study=answer{1};
+subjid=answer{2};
 
 %% Specify number of craved and not craved images
 n_craved = 60;
