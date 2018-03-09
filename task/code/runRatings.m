@@ -19,6 +19,9 @@ addpath(fullfile(homepath,'code'));
 % set study name
 study='FP';
 
+% set dropbox path for copying
+dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
+
 % set prompt info and default answers
 prompt={'Subject ID (3 digits)'; 'Craved category 1'; 'Craved category 2'; 'Craved category 3'};
 name='Subject Info';
@@ -294,6 +297,19 @@ DrawFormattedText(w,'The task is now complete.\n\nPlease tell the researcher you
 Screen('Flip',w);
 WaitSecs(5);
 sca
+
+%% Copy files to dropbox
+subCode = sprintf('%s%s%d',study,placeholder,ID);
+subDir = fullfile(dropboxDir,subCode);
+
+if ~exist(subDir)
+    copyfile(fullfile(outputDir,[subCode,'*']), subDir);
+    disp(sprintf('Output files copied to %s',subDir));
+else
+    copyfile(fullfile(outputDir,[subCode,'*']), subDir);
+    disp(sprintf('Output files copied to %s',subDir));
+end
+
 %% Check if enough trials
 
 tiers = cell2mat(ImgRatings_sorted(:,2));
