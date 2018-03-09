@@ -17,13 +17,13 @@ homepath = pathtofile(1:(regexp(pathtofile,'code/runRating') - 1));
 addpath(fullfile(homepath,'code'));
 
 % set study name
-study='FP';
+study = input('Study code:  ', 's');
 
 % set dropbox path for copying
 dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
 
 % set prompt info and default answers
-prompt={'Subject ID (3 digits)'; 'Craved category 1'; 'Craved category 2'; 'Craved category 3'};
+prompt={'Subject number (3 digits)'; 'Craved category 1'; 'Craved category 2'; 'Craved category 3'};
 name='Subject Info';
 defAns={'999'; ''; ''; ''};
 options.WindowStyle = 'normal';
