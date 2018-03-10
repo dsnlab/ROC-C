@@ -307,11 +307,6 @@ DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PT
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
 
-%% Print run summary to command window
-disp('------------------------------');
-disp(sprintf('Number of look trials = %d', nLook));
-disp(sprintf('Number of regulate trials = %d', nRegulate));
-disp('------------------------------');
 %% Close screen
 if ~exist('sprout')
     % Housekeeping after the party
@@ -335,3 +330,9 @@ else
     copyfile(sprintf('output/%s/',subCode), subDir);
     disp(sprintf('Output files copied to %s',subDir));
 end
+
+%% Print run summary to command window
+disp('------------------------------');
+disp(sprintf('Number of look choices = %d', nLook));
+disp(sprintf('Number of regulate choices = %d', nRegulate));
+disp('------------------------------');
