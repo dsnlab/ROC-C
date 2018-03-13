@@ -27,7 +27,7 @@ blockOrder = order(randperm(length(order)));
 trialOrder = repelem(blockOrder, 3);
 
 %% Load subject condition info
-subInput = sprintf('%sinput/%s%d_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
+subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
 
 if exist(subInput)
     load(subInput);

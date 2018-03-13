@@ -34,7 +34,7 @@ trialOrder = repelem(blockOrder, 3);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load subject condition info
-subInput = sprintf('%sinput/%s%d_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
+subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
 
 if exist(subInput)
     load(subInput);
@@ -315,7 +315,7 @@ if ~exist('sprout')
 end
 
 %% Save as .csv and copy files to dropbox
-subCode = sprintf('%s%d',study,PTBParams.subjid);
+subCode = sprintf('%s%s',study,PTBParams.subjid);
 subDir = fullfile(dropboxDir,subCode);
 outputFile = fullfile(homepath,'output',subCode,sprintf('%s_%s.csv',subCode,runNum));
 

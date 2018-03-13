@@ -47,8 +47,8 @@ HideCursor; %comment out for testing only
 screenNum=0;
 
 % Set screen size and parameters
-%[w, rect] = Screen('OpenWindow',screenNum);
-[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
+[w, rect] = Screen('OpenWindow',screenNum);
+%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
 
 ctr = [rect(3)/2, rect(4)/2]; 
 ifi = Screen('GetFlipInterval', w);
@@ -69,7 +69,7 @@ PTBParams.ifi = ifi;
 PTBParams.homepath = homepath;
 PTBParams.keys = initKeys(inMRI);
 PTBParams.inMRI = inMRI;
-PTBParams.subjid = str2double(subjid);
+PTBParams.subjid = subjid;
 PTBParams.ssnid = ssnid;
 
 % Flip screen
