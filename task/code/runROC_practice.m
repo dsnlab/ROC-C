@@ -139,7 +139,7 @@ trial = 1;
 cueWait = 2;
 fixWait = 2;
 previewWait = 2;
-foodWait = 5; 
+foodWait = 6; 
 
 % Run task
 for block = 1:length(blockOrder)
