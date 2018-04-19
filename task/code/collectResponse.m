@@ -16,10 +16,17 @@ function [Resp, RT] = collectResponse(varargin)
 % to accept as input only certain keys, enter the allowed keys as a string
 % (e.g. '12345' or 'bv')
 
-% Set defaults
+% Set defaults and initialize variables
 ListenTime = Inf;
 moveOn = 1;
 allowedKeys = [];
+StartWaiting = GetSecs();
+Resp = 'NULL';
+RT = NaN;
+chose = 0;
+multiResponse = [];
+multiRT = [];
+
 if length(varargin) >= 1
     ListenTime = varargin{1};
 end
@@ -40,46 +47,57 @@ if ListenTime == Inf && moveOn ~= 1
     error('Infinite loop: You asked me to wait forever, even AFTER the subject has responded!')
 end
 
-% Specifies how long to listen for subject's response
-StartWaiting = GetSecs();
-Resp = 'NULL';
-RT = 'NaN';
-
-while KbCheck(-1)
-end
+% Start queue
+KbQueueCreate;
+KbQueueStart;
 
 if isempty(allowedKeys)
     while (GetSecs() - StartWaiting) < ListenTime
-        [keyDown, secs, key] = KbCheck(-1);
-        if keyDown == 1
-            Resp = KbName(find(key==1));
-            Resp = Resp(1);
-            RT = secs-StartWaiting;
-            break;
+        [pressed, firstPress] = KbQueueCheck;
+        if pressed
+            if chose == 0
+              RT = firstPress(find(firstPress)) - StartWaiting;
+              RespKey = KbName(find(firstPress));
+              Resp = RespKey(1);
+            elseif chose == 1
+              multiResponse = [multiResponse Resp];
+              multiRT =[multiRT RT];
+              RT = firstPress(find(firstPress)) - StartWaiting;
+              RespKey = KbName(find(firstPress));
+              Resp = RespKey(1);
+            end
+            chose=1;
         end
-    end
+    end    
 else
     while (GetSecs() - StartWaiting) < ListenTime
-        [keyDown, secs, key] = KbCheck(-1);
-        if keyDown == 1
-            if ~iscell(KbName(find(key==1)))
-                Resp = KbName(find(key==1));
-                Resp = Resp(1);
-
-                if any(allowedKeys==Resp)
-                    RT = secs-StartWaiting;
-                    break;
-                else
-                    Resp = 'NULL';
-                end
+        [pressed, firstPress] = KbQueueCheck;
+        if pressed
+            if chose == 0
+              RT = firstPress(find(firstPress)) - StartWaiting;
+              RespKey = KbName(find(firstPress));
+              Resp = RespKey(1);
+              if ~any(allowedKeys==Resp)
+                  Resp = 'NULL';
+                  RT = NaN;
+              end
+            elseif chose == 1
+              multiResponse = [multiResponse Resp];
+              multiRT =[multiRT RT];
+              RT = firstPress(find(firstPress)) - StartWaiting;
+              RespKey = KbName(find(firstPress));
+              Resp = RespKey(1);
+              if ~any(allowedKeys==Resp)
+                  Resp = 'NULL';
+                  RT = NaN;
+              end
             end
+            chose=1;
         end
-    end
+    end    
 end
 
 if moveOn ~= 1
     while (GetSecs() - StartWaiting) < ListenTime
     end
 end
-
-    
