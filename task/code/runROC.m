@@ -183,11 +183,6 @@ for block = 1:length(blockOrder)
     % Randomize trial images within block
     foodTrials = [Food(trial), Food(trial+1), Food(trial+2)];
     foodRand = foodTrials(randperm(length(foodTrials)));
-    
-    % Draw fixation 
-%     DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-%     Screen(PTBParams.win,'Flip');
-%     WaitSecs(1);
 
     % Draw preview images
     foodCoords1 = findPicLoc(size(foodJpg{foodRand(1)}),[.2,.45],PTBParams,'ScreenPct',.25);
