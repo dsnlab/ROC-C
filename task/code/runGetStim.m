@@ -27,9 +27,9 @@ rng('shuffle')
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
 
 % set prompt info and default answers
-prompt={'Study code'; 'Subject number (3 digits)'};
-name='Subject Info';
-defAns={''; '999'};
+prompt = {'Study code'; 'Subject number (3 digits)'};
+name = 'Subject Info';
+defAns = {'HL'; '999'};
 options.WindowStyle = 'normal';
 
 % open dialog box
@@ -38,15 +38,16 @@ options.WindowStyle = 'normal';
 % TextInfo.FontSize = get(0,'FactoryUicontrolFontSize') -->
 % TextInfo.FontSize = 14
 
-answer=inputdlg(prompt,name,1,defAns,options);
+answer = inputdlg(prompt,name,1,defAns,options);
 
 % name variables from inputs
-study=answer{1};
-subjid=answer{2};
+study = answer{1};
+subjid = answer{2};
 
 %% Specify number of craved and not craved images
 n_craved = 60;
 n_notcraved = 30;
+n_preview = 9;
 
 %% Specify number of runs and trials per run
 nruns = 3;
@@ -112,9 +113,6 @@ ratings = imageinfo{1,1};
 category = imageinfo{1,2};
 images = imageinfo{1,3};
 
-% Recode least craved category (0 = 4)
-category(category == 0) = 4;
-
 % Code NaN ratings as 0 for sorting
 ratingsNaN = [ratings, category];
 if sum(isnan(ratingsNaN(:,1))) > 0
@@ -122,7 +120,7 @@ if sum(isnan(ratingsNaN(:,1))) > 0
     ratingsNaN(isnan(ratingsNaN(:,1))) = 0;
 end
 
-% Sort images by rating (ascending 1 --> 4) and category (descending 4 --> 1)
+% Sort images by rating (ascending 1 --> 4) and category (descending 3 --> 1)
 [sortedvals, sortidx] = sortrows(ratingsNaN,[1, -2]);
 sortedratings = sortedvals(:,1);
 
@@ -141,9 +139,13 @@ else
     sortidx_g0 = sortidx(sortedratings > 0);
 end
 
-% Select first and last n trials 
-craved = images(sortidx_g0(end-(n_craved-1):end));
-notcraved = images(sortidx_g0(1:n_notcraved));
+% Select first and next n trials 
+craved = images(sortidx_g0(end-(n_craved-1):end)); % highest rated n images
+notcraved = images(sortidx_g0((end-n_craved-n_notcraved+1):end-(n_craved))); % next highest rated n images
+%notcraved = images(sortidx_g0(1:n_notcraved)); % lowest rated n images
+
+% Select practice images
+practice = images(sortidx_g0((end-n_craved-n_notcraved-n_preview+1):(end-n_craved-n_notcraved))); % next highest n images 
 
 % Randomize images
 craved_rand = craved(randperm(length(craved)));
@@ -226,7 +228,7 @@ end
 
 %% Save subject trial condition output
 suboutput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,subjid,ssnid);
-save(suboutput, 'run*_*', 'images','ratings')
+save(suboutput, 'run*_*', 'images', 'ratings', 'practice')
 
 %% Clean up
 clear all; close all; Screen('CloseAll'); 
