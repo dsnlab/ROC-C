@@ -184,6 +184,11 @@ for block = 1:length(blockOrder)
     foodTrials = [Food(trial), Food(trial+1), Food(trial+2)];
     foodRand = foodTrials(randperm(length(foodTrials)));
     
+    % Draw fixation 
+%     DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+%     Screen(PTBParams.win,'Flip');
+%     WaitSecs(1);
+
     % Draw preview images
     foodCoords1 = findPicLoc(size(foodJpg{foodRand(1)}),[.2,.45],PTBParams,'ScreenPct',.25);
     foodCoords2 = findPicLoc(size(foodJpg{foodRand(2)}),[.5,.45],PTBParams,'ScreenPct',.25);
@@ -242,7 +247,10 @@ for block = 1:length(blockOrder)
     % Run trials within block
     for blockTrial = 1:blockSize %num trials
         foodTrial = foodRand(blockTrial); 
+        
+        % Show food, fixation, and craving ratings
         showFood
+        
         % Collect craving rating responses
         if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
             [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
@@ -281,12 +289,17 @@ for block = 1:length(blockOrder)
             rtEffort = rtEffort + extraWait;
         end
             
-        % Draw fixation
-        DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-        effortOff = Screen(PTBParams.win,'Flip');
+        % Get effort timing
+        effortOff = GetSecs;
         effortOnset = ratingOffset;
         effortOffset = effortOff-StartTime;
-        effortDuration = effortOffset-ratingOffset;
+        effortDuration = effortOffset-effortOnset;
+        
+        % Draw fixation after first and second trials
+        if blockTrial < blockSize
+            DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+            Screen(PTBParams.win,'Flip');
+        end
         
         % If no effort rating response, continue to collect responses 
         if strcmp(respEffort, 'NULL')
@@ -301,7 +314,7 @@ for block = 1:length(blockOrder)
         
         % Log data in .mat file
         logData(datafile,runNum,trial,ISI, ...
-            foodPic,foodNum,cond,likingRating, ...
+            foodPic,foodNum,cond,likingRating,craved, ...
             previewOnset,cueOnset,foodOnset,ratingOnset,effortOnset, ...
             previewDuration,cueDuration,foodDuration,ratingDuration,effortDuration, ...
             respCue,respRating,respEffort, ...
