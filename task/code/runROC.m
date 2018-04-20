@@ -112,7 +112,7 @@ if length(Jitter) < length(trialOrder)
         length(Jitter), length(trialOrder), fullfile(homepath,'input','jitter.mat'))
 end
 
-%% Initialize keys
+%% Initialize keys and create KbQueue
 inputDevice = PTBParams.keys.deviceNum;
 
 %% Load task instructions based on MRI or behavioral session
@@ -128,6 +128,7 @@ Screen(PTBParams.win,'Flip');
 % Wait for a 'spacebar' to start the behavioral version, and an ' for the scanner version
 scantrig;
 
+% Create datafile and log start time and jitter
 datafile = PTBParams.datafile;
 logData(datafile,runNum,1,StartTime,Jitter);
 
@@ -142,12 +143,16 @@ posNum_y = 2*PTBParams.rect(4)/3.5;
 posRate1_x = PTBParams.rect(3)/8;
 posRate2_x = 5.4*PTBParams.rect(3)/8;
 
-% define trial and wait times
+% Define trial and wait times
 trial = 1;
 cueWait = 2;
 fixWait = 2;
 previewWait = 2;
-foodWait = 6; 
+foodWait = 6;
+fixRatings = 1;
+ratingWait = 2.5;
+extraWait = .5; % collect responses for an additional 500 ms
+effortWait = 2; % rating on screen: 2000 ms effort collection + 500ms craving collection
 
 % Run task
 for block = 1:length(blockOrder)
@@ -217,8 +222,10 @@ for block = 1:length(blockOrder)
     if strcmp(respCue, 'NULL')
         if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
             [respCue, rtCue] = collectResponse(fixWait,0,'56');
+            rtCue = rtCue + cueWait;
         else
             [respCue, rtCue] = collectResponse(fixWait,0,'12');
+            rtCue = rtCue + cueWait;
         end
     end
     
@@ -236,12 +243,12 @@ for block = 1:length(blockOrder)
     for blockTrial = 1:blockSize %num trials
         foodTrial = foodRand(blockTrial); 
         showFood
-        ratingWait = 2.5;
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
-            else
-                [respRating, rtRating] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
-            end
+        % Collect craving rating responses
+        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+            [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
+        else
+            [respRating, rtRating] = collectResponse(ratingWait,0,'1234');
+        end
  
         % Draw effort ratings
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
@@ -253,11 +260,26 @@ for block = 1:length(blockOrder)
         ratingOff = Screen(PTBParams.win,'Flip');
         ratingOffset = ratingOff-StartTime;
         ratingDuration = ratingOffset-ratingOnset;
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678');
+        
+        % If no craving rating response, continue to collect responses
+        if strcmp(respRating, 'NULL')
+            if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
+                [respRating, rtRating] = collectResponse(extraWait,0,'5678');
+                rtRating = rtRating + ratingWait;
             else
-                [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
+                [respRating, rtRating] = collectResponse(extraWait,0,'1234');
+                rtRating = rtRating + ratingWait;
             end
+        end
+        
+        % Collect effort rating responses
+        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+            [respEffort, rtEffort] = collectResponse(effortWait,0,'5678');
+            rtEffort = rtEffort + extraWait;
+        else
+            [respEffort, rtEffort] = collectResponse(effortWait,0,'1234');
+            rtEffort = rtEffort + extraWait;
+        end
             
         % Draw fixation
         DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
@@ -266,12 +288,23 @@ for block = 1:length(blockOrder)
         effortOffset = effortOff-StartTime;
         effortDuration = effortOffset-ratingOffset;
         
+        % If no effort rating response, continue to collect responses 
+        if strcmp(respEffort, 'NULL')
+            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+                [respEffort, rtEffort] = collectResponse(extraWait,0,'5678');
+                rtEffort = rtEffort + effortWait + extraWait;
+            else
+                [respEffort, rtEffort] = collectResponse(extraWait,0,'1234');
+                rtEffort = rtEffort + effortWait + extraWait;
+            end
+        end
+        
         % Log data in .mat file
         logData(datafile,runNum,trial,ISI, ...
             foodPic,foodNum,cond,likingRating, ...
             previewOnset,cueOnset,foodOnset,ratingOnset,effortOnset, ...
             previewDuration,cueDuration,foodDuration,ratingDuration,effortDuration, ...
-            respCue,respRating,respEffort, ...Change 
+            respCue,respRating,respEffort, ...
             rtCue,rtRating,rtEffort);
         
         % Update trial number
@@ -279,10 +312,13 @@ for block = 1:length(blockOrder)
     end
 end
 
+% Release queue
+KbQueueRelease;
+
 % Wait for 2s
 WaitSecs(2);
 
-% Show run rummary for 4s and log endtime
+% Show run rummary for 4s
 load(datafile)
 idxs = find(strcmp(Data.(char(runNum)).cond, 'CHOOSE'));
 nLook = sum(strcmp(Data.(char(runNum)).respCue(idxs), '1'))/blockSize;
@@ -299,6 +335,7 @@ DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,P
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
 
+% Log end time
 EndTime = GetSecs-StartTime;
 logData(datafile,runNum,1,EndTime);
 
