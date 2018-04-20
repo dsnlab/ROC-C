@@ -37,8 +37,8 @@ inMRI = str2double(answer{3});
 %% Initialize PsychToolbox parameters and save in PTBParams struct
 AssertOpenGL;
 ListenChar(2); % don't print keypresses to screen
-%Screen('Preference', 'SkipSyncTests', 1); % use if VBL fails; use this setting on the laptop
-Screen('Preference', 'VisualDebugLevel',3);
+Screen('Preference', 'SkipSyncTests', 1); % use if VBL fails; use this setting on the laptop
+%Screen('Preference', 'VisualDebugLevel',3);
 
 HideCursor; %comment out for testing only
 
