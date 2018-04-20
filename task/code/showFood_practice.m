@@ -16,11 +16,8 @@ else
     ISI = Jitter(trial);
 end
 
-% Display fixation 
-%DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-%TrialStart = Screen(PTBParams.win,'Flip');
+% Define trial start
 trialStart=GetSecs;
-fixDuration = (trialStart-StartTime)-fixOnset;
 
 % Display food
 foodCoords = findPicLoc(size(foodJpg{foodTrial}),[.5,.45],PTBParams,'ScreenPct',.55);
@@ -29,6 +26,10 @@ Screen('DrawTexture',PTBParams.win,FoodScreen,[],foodCoords);
 Screen('FrameRect', PTBParams.win, color, foodCoords, 10);
 foodOn = Screen(PTBParams.win,'Flip', trialStart+ISI); 
 
+% Display fixation cross
+DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+fixOn = Screen(PTBParams.win,'Flip', foodOn+foodWait);
+
 % Display rating prompt after time specified in WaitTime
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'Desire to eat?','center',posCue_y,PTBParams.white);
@@ -36,7 +37,7 @@ Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'no desire',.65*posRate1_x,posPress_y,PTBParams.blue);
 DrawFormattedText(PTBParams.win,'strong desire',.97*posRate2_x,posPress_y,PTBParams.blue);
 DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
-ratingOn = Screen(PTBParams.win,'Flip',foodOn+foodWait);
+ratingOn = Screen(PTBParams.win,'Flip',fixOn+fixRatings);
 Screen('Close',FoodScreen);
 
 

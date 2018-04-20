@@ -139,7 +139,9 @@ trial = 1;
 cueWait = 2;
 fixWait = 2;
 previewWait = 2;
-foodWait = 6; 
+foodWait = 6;
+fixRatings = 1;
+ratingWait = 2.5;
 
 % Run task
 for block = 1:length(blockOrder)
@@ -194,6 +196,8 @@ for block = 1:length(blockOrder)
     DrawFormattedText(PTBParams.win,numText2,posPress2_x,posPress_y,PTBParams.white);
     DrawFormattedText(PTBParams.win,num2,posNum2_x,posNum_y,PTBParams.white);
     cueOn = Screen(PTBParams.win,'Flip');
+    
+    % Collect cue response
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
         [respCue, rtCue] = collectResponse(cueWait,0,'56');
     else
@@ -229,13 +233,16 @@ for block = 1:length(blockOrder)
     % Run trials within block
     for blockTrial = 1:blockSize %num trials
         foodTrial = foodRand(blockTrial); 
+
+        % Show food, fixation, and craving ratings
         showFood_practice
-        ratingWait = 2.5;
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
-            else
-                [respRating, rtRating] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
-            end
+        
+        % Collect craving rating responses
+        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+            [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
+        else
+            [respRating, rtRating] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
+        end
  
         % Draw effort ratings
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
@@ -245,20 +252,27 @@ for block = 1:length(blockOrder)
         DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
         DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
         ratingOff = Screen(PTBParams.win,'Flip');
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678');
-            else
-                [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
-            end
+        
+        % Collect effort rating responses
+        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+            [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678');
+        else
+            [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
+        end
             
-        % Draw fixation
-        DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-        effortOff = Screen(PTBParams.win,'Flip');
+        % Draw fixation after first and second trials
+        if blockTrial < blockSize
+            DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+            Screen(PTBParams.win,'Flip');
+        end
         
         % Update trial number
         trial=trial+1;
     end
 end
+
+% Release queue
+KbQueueRelease;
 
 % Wait for 2s
 WaitSecs(2);
