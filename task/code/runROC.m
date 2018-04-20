@@ -112,7 +112,7 @@ if length(Jitter) < length(trialOrder)
         length(Jitter), length(trialOrder), fullfile(homepath,'input','jitter.mat'))
 end
 
-%% Initialize keys and create KbQueue
+%% Initialize keys
 inputDevice = PTBParams.keys.deviceNum;
 
 %% Load task instructions based on MRI or behavioral session
@@ -207,6 +207,8 @@ for block = 1:length(blockOrder)
     DrawFormattedText(PTBParams.win,numText2,posPress2_x,posPress_y,PTBParams.white);
     DrawFormattedText(PTBParams.win,num2,posNum2_x,posNum_y,PTBParams.white);
     cueOn = Screen(PTBParams.win,'Flip');
+    
+    % Collect cue response
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
         [respCue, rtCue] = collectResponse(cueWait,0,'56');
     else
