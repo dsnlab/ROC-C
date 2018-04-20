@@ -290,7 +290,7 @@ for block = 1:length(blockOrder)
         effortOff = GetSecs;
         effortOnset = ratingOffset;
         effortOffset = effortOff-StartTime;
-        effortDuration = effortOffset-effortOnset;
+        effortDuration = effortOffset-ratingOffset;
         
         % Draw fixation after first and second trials
         if blockTrial < blockSize
