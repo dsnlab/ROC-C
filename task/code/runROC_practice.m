@@ -24,7 +24,8 @@ rng('shuffle')
 %% Create trial order
 order = repelem({'LOOK', 'REGULATE', 'CHOOSE'}, 1);
 blockOrder = order(randperm(length(order)));
-trialOrder = repelem(blockOrder, 3);
+blockSize = 3;
+trialOrder = repelem(blockOrder, blockSize);
 
 %% Load subject condition info
 subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
@@ -35,45 +36,8 @@ else
     error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStimWTP.m',subInput);
 end
 
-%% Define image order based on trial and condition info
-jpgs = cell(1,length(trialOrder));
-conds = unique(trialOrder);
-blockSize = 3;
-a = 1;
-c = 1;
-runNum=1; %%%%REPLACE THIS WITH PRACTICE IMAGES%%%%
-for i = 1:length(conds)
-    condition = conds{i};
-    idxs = find(strcmp(trialOrder,condition));
-    b = 1;
-    for j = 1:length(idxs)/blockSize
-        % set index position
-        idx = idxs(b);
-        
-        % fill with first craved image
-        jpgs{idx} = eval(sprintf('run%d_craved{a,1}',char(runNum)));
-        
-        % update index positions
-        a = a+1;
-        b = b+1;
-        idx = idxs(b);
-        
-        % fill with second craved image
-        jpgs{idx} = eval(sprintf('run%d_craved{a,1}',char(runNum)));
-        
-        % update index positions
-        b = b+1;
-        idx = idxs(b);
-        
-        % fill with second craved image
-        jpgs{idx} = eval(sprintf('run%d_notcraved{c,1}',char(runNum)));
-        
-        % update index positions
-        a = a+1;
-        b = b+1;
-        c = c+1;
-    end
-end
+%% Define image order 
+jpgs = practice;
 
 %% Check images to ensure no image is selected twice
 [unique_jpgs, i] = unique(jpgs,'first');
@@ -87,7 +51,7 @@ end
 %% Preload Stimulus Pictures 
 % Load food bitmaps into memory
 for x = 1:length(jpgs)
-    foodJpg{x} = imread(fullfile(sprintf('%sstimuli/run%d/%s', homepath, char(runNum), jpgs{x})),'jpg');
+    foodJpg{x} = imread(fullfile(sprintf('%sstimuli/practice/%s', homepath, jpgs{x})),'jpg');
 end
 
 % Specify food order (sequential because order is defined in previous chunk)
