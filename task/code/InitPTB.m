@@ -21,7 +21,7 @@ while checksubjid == 1
     % set prompt info and default answers
     prompt={'Study code'; 'Subject number (3 digits)'; 'Run number (1-3)'; 'MRI session? (0 = no, 1 = yes)'};
     name='Subject Info';
-    defAns={''; '999'; ''; ''};
+    defAns={'HL'; '999'; ''; ''};
     options.WindowStyle = 'normal';
 
     % open dialog box
@@ -75,7 +75,7 @@ ListenChar(2); % don't print keypresses to screen
 Screen('Preference', 'SkipSyncTests', 1); % use if VBL fails; use this setting on the laptop
 %Screen('Preference', 'VisualDebugLevel',3);
 
-HideCursor; %comment out for testing only
+HideCursor; % Comment out for debugging
 
 % Set screen number
 %screenNum=max(Screen('Screens'));
@@ -83,7 +83,7 @@ screenNum=0;
 
 % Set screen size and parameters
 [w, rect] = Screen('OpenWindow',screenNum);
-%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
+%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); % Use for debugging
 
 ctr = [rect(3)/2, rect(4)/2]; 
 ifi = Screen('GetFlipInterval', w);
