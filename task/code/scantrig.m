@@ -12,3 +12,4 @@ StartTime = GetSecs;
     
 DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
 Screen(PTBParams.win,'Flip');
+WaitSecs(1);
