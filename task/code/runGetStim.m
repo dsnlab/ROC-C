@@ -47,7 +47,7 @@ subjid = answer{2};
 %% Specify number of craved and not craved images
 n_craved = 60;
 n_notcraved = 30;
-n_preview = 9;
+n_practice = 9;
 
 %% Specify number of runs and trials per run
 nruns = 3;
@@ -108,6 +108,18 @@ for i = 1:nruns
     end 
 end
 
+% Remove practice images and create directory if it does not exist
+practicedir = fullfile(sprintf('%sstimuli/practice', homepath));
+if numel(dir(practicedir)) > 2
+    disp('Removing files from practice directory')
+    delete(sprintf('%sstimuli/practice/*.jpg', homepath));
+end
+
+if ~exist(practicedir)
+    disp('Practice directory did not exist. Creating it now')
+    mkdir(practicedir);
+end 
+
 %% Sort foods to determine craved and not craved foods
 ratings = imageinfo{1,1};
 category = imageinfo{1,2};
@@ -145,7 +157,7 @@ notcraved = images(sortidx_g0((end-n_craved-n_notcraved+1):end-(n_craved))); % n
 %notcraved = images(sortidx_g0(1:n_notcraved)); % lowest rated n images
 
 % Select practice images
-practice = images(sortidx_g0((end-n_craved-n_notcraved-n_preview+1):(end-n_craved-n_notcraved))); % next highest n images 
+practice = images(sortidx_g0((end-n_craved-n_notcraved-n_practice+1):(end-n_craved-n_notcraved))); % next highest n images 
 
 % Randomize images
 craved_rand = craved(randperm(length(craved)));
@@ -198,6 +210,14 @@ for i = 1:nruns
   last = last + n;
 end
 
+%% Copy practice images
+disp('Adding practice images to practice directory')
+for i = 1:length(practice)
+  runimg = practice{i};
+  category = runimg(1:regexp(runimg,'[0-9]{2}.jpg')-1);
+  copyfile(fullfile(homepath,'stimuli','categories',category,runimg), fullfile(homepath,'stimuli/practice')); 
+end
+
 %% Check images to ensure no image is selected twice
 runcheck = who('run*_*craved*');
 b = [];
@@ -220,12 +240,15 @@ selectedidx = cellfun(@(x) ismember(x, selected), imageinfo{1,3}, 'UniformOutput
 ratings = imageinfo{1,1}(cell2mat(selectedidx) == 1);
 images = imageinfo{1,3}(cell2mat(selectedidx) == 1);
 
-%% Print number of runs and images in each run
+%% Print number of images in each run and practice directory
 for i = 1:nruns
     n = numel(dir(sprintf('%sstimuli/run%d/*.jpg',homepath,i)));
     fprintf('Run directory %d contains %d images\n',i,n);
 end
 
+n = numel(dir(sprintf('%sstimuli/practice/*.jpg',homepath)));
+fprintf('Practice directory contains %d images\n',n);
+    
 %% Save subject trial condition output
 suboutput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,subjid,ssnid);
 save(suboutput, 'run*_*', 'images', 'ratings', 'practice')
