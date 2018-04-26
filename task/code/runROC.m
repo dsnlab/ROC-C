@@ -336,7 +336,7 @@ nRegulate = sum(strcmp(Data.(char(runNum)).respCue(idxs), '2'))/blockSize;
 posPress2_x = 5.35*PTBParams.rect(3)/8;
 
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'Run summary for choose trials:','center',posCue_y,PTBParams.white);
+DrawFormattedText(PTBParams.win,'Run summary for choose sets:','center',posCue_y,PTBParams.white);
 Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
 DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
 DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
