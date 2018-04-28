@@ -44,7 +44,7 @@ answer = inputdlg(prompt,name,1,defAns,options);
 study = answer{1};
 subjid = answer{2};
 
-%% Specify number of craved and not craved images
+%% Specify number of craved and less craved images
 n_craved = 60;
 n_notcraved = 30;
 n_practice = 9;
@@ -120,7 +120,7 @@ if ~exist(practicedir)
     mkdir(practicedir);
 end 
 
-%% Sort foods to determine craved and not craved foods
+%% Sort foods to determine craved and less craved foods
 ratings = imageinfo{1,1};
 category = imageinfo{1,2};
 images = imageinfo{1,3};
@@ -187,13 +187,13 @@ for i = 1:nruns
 end
 
 
-%% Not craved foods: Specify runs and first and last images to select from top images
+%% less craved foods: Specify runs and first and last images to select from top images
 n = length(notcraved_rand)/nruns;
 first = 1;
 last = n; 
 
-% Create run variables with image positions for not craved foods
-disp('Adding not craved foods to run directories')
+% Create run variables with image positions for less craved foods
+disp('Adding less craved foods to run directories')
 for i = 1:nruns
   % specify image positions and images
   evalc(sprintf('run%d_notcraved = notcraved_rand(first:last)', i));
