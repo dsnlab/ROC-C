@@ -152,7 +152,8 @@ foodWait = 6;
 fixRatings = 1;
 ratingWait = 2.5;
 extraWait = .5; % collect responses for an additional 500 ms
-effortWait = 2; % rating on screen: 2000 ms effort collection + 500ms craving collection
+effortWaitShort = 2; % rating on screen: 2000 ms effort collection + 500ms craving collection
+effortWait = 2.5; % rating on screen: 2500 ms effort collection
 
 % Run task
 for block = 1:length(blockOrder)
@@ -262,11 +263,12 @@ for block = 1:length(blockOrder)
         DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.teal  );
         DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
         DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
-        ratingOff = Screen(PTBParams.win,'Flip');
-        ratingOffset = ratingOff-StartTime;
+        effortOn = Screen(PTBParams.win,'Flip');
+        ratingOffset = effortOn-StartTime;
         ratingDuration = ratingOffset-ratingOnset;
         
-        % If no craving rating response, continue to collect responses
+        % If no craving rating response, continue to collect craving
+        % response for an additional 500 ms
         if strcmp(respRating, 'NULL')
             if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
                 [respRating, rtRating] = collectResponse(extraWait,0,'5678');
@@ -275,22 +277,30 @@ for block = 1:length(blockOrder)
                 [respRating, rtRating] = collectResponse(extraWait,0,'1234');
                 rtRating = rtRating + ratingWait;
             end
-        end
-        
-        % Collect effort rating responses
-        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respEffort, rtEffort] = collectResponse(effortWait,0,'5678');
-            rtEffort = rtEffort + extraWait;
+            
+            % Collect effort rating responses for 2000 ms
+            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+                [respEffort, rtEffort] = collectResponse(effortWaitShort,0,'5678');
+                rtEffort = rtEffort + extraWait;
+            else
+                [respEffort, rtEffort] = collectResponse(effortWaitShort,0,'1234');
+                rtEffort = rtEffort + extraWait;
+            end
         else
-            [respEffort, rtEffort] = collectResponse(effortWait,0,'1234');
-            rtEffort = rtEffort + extraWait;
+            % If there is a craving rating response, collect effort rating
+            % responses for 2500 ms
+            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
+                [respEffort, rtEffort] = collectResponse(effortWait,0,'5678');
+            else
+                [respEffort, rtEffort] = collectResponse(effortWait,0,'1234');
+            end
         end
             
         % Get effort timing
         effortOff = GetSecs;
-        effortOnset = ratingOffset;
+        effortOnset = effortOn-StartTime;
         effortOffset = effortOff-StartTime;
-        effortDuration = effortOffset-ratingOffset;
+        effortDuration = effortOffset-effortOnset;
         
         % Draw fixation after first and second trials
         if blockTrial < blockSize
@@ -302,10 +312,10 @@ for block = 1:length(blockOrder)
         if strcmp(respEffort, 'NULL')
             if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
                 [respEffort, rtEffort] = collectResponse(extraWait,0,'5678');
-                rtEffort = rtEffort + effortWait + extraWait;
+                rtEffort = rtEffort + effortWait;
             else
                 [respEffort, rtEffort] = collectResponse(extraWait,0,'1234');
-                rtEffort = rtEffort + effortWait + extraWait;
+                rtEffort = rtEffort + effortWait;
             end
         end
         
