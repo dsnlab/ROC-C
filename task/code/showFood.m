@@ -9,11 +9,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Run script for each trial
-% Specify food image
-if PTBParams.inMRI == 1
-    ISI = Jitter(trial)+3;
+if PTBParams.inMRI == 1 && blockTrial == 1
+    ITI = fixCue;
+elseif PTBParams.inMRI == 1 && blockTrial > 1
+    ITI = Jitter(trial-1)+3;
 else
-    ISI = Jitter(trial);
+    ITI = Jitter(trial-1);
 end
 
 % Define trial start
@@ -24,7 +25,7 @@ foodCoords = findPicLoc(size(foodJpg{foodTrial}),[.5,.45],PTBParams,'ScreenPct',
 FoodScreen = Screen('MakeTexture',PTBParams.win,foodJpg{foodTrial});
 Screen('DrawTexture',PTBParams.win,FoodScreen,[],foodCoords);
 Screen('FrameRect', PTBParams.win, color, foodCoords, 10);
-foodOn = Screen(PTBParams.win,'Flip', trialStart+ISI); 
+foodOn = Screen(PTBParams.win,'Flip', trialStart+ITI); 
 
 % Display fixation cross
 DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);

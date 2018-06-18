@@ -39,7 +39,7 @@ subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subji
 if exist(subInput)
     load(subInput);
 else
-    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStimWTP.m',subInput);
+    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStimROC.m',subInput);
 end
 
 %% Define image order based on trial and condition info
@@ -87,7 +87,7 @@ duplicates = jpgs(not(ismember(1:numel(jpgs),i)));
 
 if ~isempty(duplicates)
     disp(sort(jpgs));
-    error('Duplicate files found. Please check ensure there are enough stimuli available.');
+    error('Duplicate files found. Please check to ensure there are enough stimuli available.');
 end
 
 %% Preload Stimulus Pictures 
@@ -145,11 +145,11 @@ posRate2_x = 5.4*PTBParams.rect(3)/8;
 
 % Define trial and wait times
 trial = 1;
-cueWait = 2;
+fixCue = 2; 
 fixWait = 2;
+fixRatings = 1;
 previewWait = 2;
 foodWait = 6;
-fixRatings = 1;
 ratingWait = 2.5;
 extraWait = .5; % collect responses for an additional 500 ms
 effortWaitShort = 2; % rating on screen: 2000 ms effort collection + 500ms craving collection
@@ -211,9 +211,9 @@ for block = 1:length(blockOrder)
     
     % Collect cue response
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-        [respCue, rtCue] = collectResponse(cueWait,0,'56');
+        [respCue, rtCue] = collectResponse(fixCue,0,'56');
     else
-        [respCue, rtCue] = collectResponse(cueWait,0,'12');
+        [respCue, rtCue] = collectResponse(fixCue,0,'12');
     end
     cueOnset = cueOn-StartTime;
     previewDuration = (cueOn-StartTime)-previewOnset;
@@ -225,10 +225,10 @@ for block = 1:length(blockOrder)
     if strcmp(respCue, 'NULL')
         if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
             [respCue, rtCue] = collectResponse(fixWait,0,'56');
-            rtCue = rtCue + cueWait;
+            rtCue = rtCue + fixCue;
         else
             [respCue, rtCue] = collectResponse(fixWait,0,'12');
-            rtCue = rtCue + cueWait;
+            rtCue = rtCue + fixCue;
         end
     end
     
@@ -303,10 +303,10 @@ for block = 1:length(blockOrder)
         effortDuration = effortOffset-effortOnset;
         
         % Draw fixation after first and second trials
-        if blockTrial < blockSize
+        %if blockTrial < blockSize
             DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
             Screen(PTBParams.win,'Flip');
-        end
+        %end
         
         % If no effort rating response, continue to collect responses 
         if strcmp(respEffort, 'NULL')
@@ -320,7 +320,7 @@ for block = 1:length(blockOrder)
         end
         
         % Log data in .mat file
-        logData(datafile,runNum,trial,ISI, ...
+        logData(datafile,runNum,trial,ITI, ...
             foodPic,foodNum,cond,likingRating,craved, ...
             previewOnset,cueOnset,foodOnset,ratingOnset,effortOnset, ...
             previewDuration,cueDuration,foodDuration,ratingDuration,effortDuration, ...
@@ -373,7 +373,7 @@ end
 
 %% Save as .csv and copy files to dropbox
 subCode = sprintf('%s%s',study,PTBParams.subjid);
-subDir = fullfile(dropboxDir,subCode);
+subDir = fullfile(dropboxDir,study,subCode);
 outputFile = fullfile(homepath,'output',subCode,sprintf('%s_%s.csv',subCode,runNum));
 
 load(datafile)
@@ -381,6 +381,7 @@ toWrite = struct2table(rmfield(Data.(char(runNum)),{'time','StartTime','Jitter',
 writetable(toWrite, outputFile, 'WriteVariableNames', true);
 
 if ~exist(subDir)
+    mkdir(subDir);
     copyfile(sprintf('output/%s',subCode), subDir);
     disp(sprintf('Output files copied to %s',subDir));
 else
@@ -393,3 +394,5 @@ disp('------------------------------');
 disp(sprintf('Number of look choices = %d', nLook));
 disp(sprintf('Number of regulate choices = %d', nRegulate));
 disp('------------------------------');
+
+EndTime
