@@ -1,4 +1,4 @@
-function [ keys ] = initKeys(inMRI)
+function [ keys ] = initKeys(inMRI, debugging)
 % % INITKEYS.m %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 %   queries PsychHID('Devices') & sets device values
@@ -7,7 +7,6 @@ function [ keys ] = initKeys(inMRI)
 % note: you'll need to replace the vendorID with whatever works for your
 % keyboard. Find out by doing >> devices = PsychHID('Devices') and poking
 % around the devices structure
-% kludge for screen during multiband calibration (shortened for debug)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -28,7 +27,13 @@ for deviceCount=1:length(devices)
         keys.trigger = 52; % trigger pulse / TR signal key ('`') for LCNI scanner
         fprintf('button box detected\n using device #%d: %s\n',deviceCount,devices(deviceCount).product);
         break,
-      end
+      % MacBook laptop setup has the usagename 'Keyboard' and the product 'Apple Internal Keyboard / Trackpad'
+      elseif debugging == 1 && (strcmp(devices(deviceCount).usageName,'Keyboard') && strcmp(devices(deviceCount).product,'Apple Internal Keyboard / Trackpad'))
+        keys.bbox = deviceCount;
+        keys.trigger = KbName('SPACE'); % use spacebar as KbTrigger
+        fprintf('Debugging for scanner #%d: internal %s\n',deviceCount,devices(deviceCount).usageName);
+        break,
+      end            
     else
       % iMac setup has the usagename 'Keyboard' and the manufacturer 'Apple'
       if strcmp(devices(deviceCount).usageName,'Keyboard') && (strcmp(devices(deviceCount).manufacturer,'Apple') || strcmp(devices(deviceCount).manufacturer,'Apple Inc.'))
