@@ -298,9 +298,10 @@ sca
 
 %% Copy files to dropbox
 subCode = sprintf('%s%s%d',study,placeholder,ID);
-subDir = fullfile(dropboxDir,subCode);
+subDir = fullfile(dropboxDir,study,subCode);
 
 if ~exist(subDir)
+    mkdir(subDir);
     copyfile(fullfile(outputDir,[subCode,'*']), subDir);
     disp(sprintf('Output files copied to %s',subDir));
 else

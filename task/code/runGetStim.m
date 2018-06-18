@@ -23,6 +23,9 @@ homepath = [pwd '/'];
 rng('default')
 rng('shuffle')
 
+%% Set dropbox path for copying
+dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
+
 %% Get study, subject id, and session number from user
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
 
@@ -54,7 +57,7 @@ nruns = 3;
 ntrials = 30;
 
 %% Load image info
-% Define dropbox path
+% Define ratings path
 ratingspath = fullfile(homepath,'ratings');
 
 % Define subject input file
@@ -252,6 +255,19 @@ fprintf('Practice directory contains %d images\n',n);
 %% Save subject trial condition output
 suboutput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,subjid,ssnid);
 save(suboutput, 'run*_*', 'images', 'ratings', 'practice')
+
+%% Copy file to dropbox
+subCode = sprintf('%s%s',study,subjid);
+subDir = fullfile(dropboxDir,study,subCode);
+
+if ~exist(subDir)
+    mkdir(subDir);
+    copyfile(suboutput, subDir);
+    disp(sprintf('Output files copied to %s',subDir));
+else
+    copyfile(suboutput, subDir);
+    disp(sprintf('Output files copied to %s',subDir));
+end
 
 %% Clean up
 clear all; close all; Screen('CloseAll'); 
