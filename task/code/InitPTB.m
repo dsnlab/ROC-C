@@ -12,6 +12,9 @@ cd(homepath);
 clear all; close all; Screen('CloseAll'); 
 homepath = [pwd '/'];
 
+%% Specify whether debugging
+debugging = 1;
+
 %% Get study and subject info and whether MRI or behavioral session
 % Check to make sure aren't about to overwrite duplicate session!
 checksubjid = 1;
@@ -82,8 +85,11 @@ HideCursor; % Comment out for debugging
 screenNum=0;
 
 % Set screen size and parameters
-[w, rect] = Screen('OpenWindow',screenNum);
-%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); % Use for debugging
+if debugging == 1
+    [w, rect] = Screen('OpenWindow',screenNum, [], [0 0 480 300]);
+else 
+    [w, rect] = Screen('OpenWindow',screenNum);
+end
 
 ctr = [rect(3)/2, rect(4)/2]; 
 ifi = Screen('GetFlipInterval', w);
@@ -105,7 +111,7 @@ PTBParams.datafile = datafile;
 PTBParams.homepath = homepath;
 PTBParams.subjid = subjid;
 PTBParams.ssnid = ssnid;
-PTBParams.keys = initKeys(inMRI);
+PTBParams.keys = initKeys(inMRI, debugging);
 PTBParams.inMRI = inMRI;
 PTBParams.(char(runNum)).runid = runid;
 
