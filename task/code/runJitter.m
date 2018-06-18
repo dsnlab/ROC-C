@@ -3,25 +3,20 @@
 % Author: Dani Cosme
 %
 % Description: This script creates the jitter based on the number of
-% specified trials and saves a vector of values in WTP/task/input as a .mat
-% file (jitter.mat)
+% specified trials and saves a vector of values in ROC-C/task/input as a 
+% .mat file (jitter.mat)
 % 
 % Dependencies: jitter.m
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% Housecleaning before the guests arrive
+%% Set path
 pathtofile = mfilename('fullpath');
-homepath = pathtofile(1:(regexp(pathtofile,'code') - 1));
-addpath(fullfile(homepath,'code'));
-
-cd(homepath);
-clear all; close all; Screen('CloseAll'); 
-homepath = [pwd '/'];
+homepath = pathtofile(1:(regexp(pathtofile,'code/runJitter') - 1));
 
 %% Create jitter vector
-ntrials = input('Total number of trials per condition (DEV = 16):  ');
-Jitter = jitter(2,ntrials,1);  %mean in first position, num trials in second position
-Jitter(Jitter > 3) = 3; %truncate max to 3 seconds of jitter
+ntrials = input('Total number of trials per condition (ROC-C = 30):  ');
+Jitter = jitter(1,ntrials,0);  %mean in first position, num trials in second position, sample from long tail in third position
+%Jitter(Jitter > 4.5) = 4.5; %truncate max to 4.5 seconds of jitter
 fprintf('The mean jitter is %1.2f\n', mean(Jitter));
 
 %% Save jitter vector
