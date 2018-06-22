@@ -13,7 +13,7 @@ clear all; close all; Screen('CloseAll');
 homepath = [pwd '/'];
 
 %% Specify whether debugging
-debugging = 1;
+debugging = 0;
 
 %% Get study and subject info and whether MRI or behavioral session
 % Check to make sure aren't about to overwrite duplicate session!
@@ -124,7 +124,7 @@ PTBParams.datafile = datafile;
 PTBParams.homepath = homepath;
 PTBParams.subjid = subjid;
 PTBParams.ssnid = ssnid;
-PTBParams.keys = initKeys(inMRI, debugging);
+PTBParams.keys = initKeys(inMRI);
 PTBParams.inMRI = inMRI;
 PTBParams.(char(runNum)).runid = runid;
 PTBParams.debugging = debugging;
