@@ -10,7 +10,9 @@
 
 %% Run script for each trial
 % Specify food image
-if PTBParams.inMRI == 1
+if PTBParams.inMRI == 1 && blockTrial == 3
+    ISI = Jitter(trial)+1;
+elseif PTBParams.inMRI == 1 && blockTrial < 3
     ISI = Jitter(trial)+3;
 else
     ISI = Jitter(trial);

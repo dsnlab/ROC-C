@@ -1,10 +1,9 @@
-%% Regulation of Craving task %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Regulation of Craving practice task %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Dani Cosme
-% Last Modified: 03-01-2018
 %
-% Description: This script runs the task. You will be prompted to specify
-% which version of the task you'd like to run (MRI, behavioral). 
+% Description: This script runs the practice task. You will be prompted to 
+% specify which version of the task you'd like to run (MRI, behavioral). 
 % 
 % You do not need to run the initial setup (InitPTB.m).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -33,7 +32,7 @@ subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subji
 if exist(subInput)
     load(subInput);
 else
-    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStimWTP.m',subInput);
+    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStim.m',subInput);
 end
 
 %% Define image order 
@@ -45,7 +44,7 @@ duplicates = jpgs(not(ismember(1:numel(jpgs),i)));
 
 if ~isempty(duplicates)
     disp(sort(jpgs));
-    error('Duplicate files found. Please check ensure there are enough stimuli available.');
+    error('Duplicate files found. Please check to ensure there are enough stimuli available.');
 end
 
 %% Preload Stimulus Pictures 
@@ -59,8 +58,8 @@ Food = 1:length(trialOrder);
 
 %% Load jitter
 if PTBParams.inMRI == 1
-    load(fullfile(homepath,'input','jitter.mat'))
-    Jitter(Jitter(1:length(trialOrder)))
+    load(fullfile(homepath,'input','jitters.mat'), 'Jitter')
+    Jitter(1:length(trialOrder));
 else
     Jitter = repelem(2,length(trialOrder)); %2s fixation for behavioral sessions
 end
@@ -104,7 +103,11 @@ cueWait = 2;
 fixWait = 2;
 previewWait = 2;
 foodWait = 6;
-fixRatings = 1;
+if PTBParams.inMRI == 1
+    fixRatings = .5;
+else
+    fixRatings = 1;
+end
 ratingWait = 2.5;
 
 % Run task
@@ -185,9 +188,9 @@ for block = 1:length(blockOrder)
     end
     
     % Change color for choose trials based on selection
-    if strcmp(cue,'CHOOSE') && strcmp(respCue,'1')
+    if strcmp(cue,'CHOOSE') && (strcmp(respCue,'1') || strcmp(respCue,'5'))
         color = PTBParams.green;
-    elseif strcmp(cue,'CHOOSE') && strcmp(respCue,'2')
+    elseif strcmp(cue,'CHOOSE') && (strcmp(respCue,'2') || strcmp(respCue,'6'))
         color = PTBParams.red;
     else
         color = color;
@@ -225,10 +228,8 @@ for block = 1:length(blockOrder)
         end
             
         % Draw fixation after first and second trials
-        if blockTrial < blockSize
-            DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-            Screen(PTBParams.win,'Flip');
-        end
+        DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+        Screen(PTBParams.win,'Flip');
         
         % Update trial number
         trial=trial+1;
@@ -239,23 +240,28 @@ end
 KbQueueRelease;
 
 % Wait for 2s
-WaitSecs(2);
+WaitSecs(6); %2
 
-% Show run rummary for 4s and log endtime
-idxs = find(strcmp(Data.cond, 'CHOOSE'));
-nLook = sum(strcmp(Data.respCue(idxs), '1'));
-nRegulate = sum(strcmp(Data.respCue(idxs), '2'));
-posPress2_x = 5.35*PTBParams.rect(3)/8;
+% % Show run rummary for 4s and log endtime
+% idxs = find(strcmp(Data.cond, 'CHOOSE'));
+% if PTBParams.inMRI == 1
+%     nLook = sum(strcmp(Data.respCue(idxs), '5'));
+%     nRegulate = sum(strcmp(Data.respCue(idxs), '6'));
+% else
+%     nLook = sum(strcmp(Data.respCue(idxs), '1'));
+%     nRegulate = sum(strcmp(Data.respCue(idxs), '2'));
+% end
+% posPress2_x = 5.35*PTBParams.rect(3)/8;
 
-Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'Run summary for choose sets:','center',posCue_y,PTBParams.white);
-Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
-DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
-DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red);
-DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
-Screen(PTBParams.win,'Flip'); 
-WaitSecs(4);
+% Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+% DrawFormattedText(PTBParams.win,'Run summary for choose sets:','center',posCue_y,PTBParams.white);
+% Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+% DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
+% DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
+% DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red);
+% DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
+% Screen(PTBParams.win,'Flip'); 
+% WaitSecs(4);
 
 % Task complete
 DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PTBParams.white);

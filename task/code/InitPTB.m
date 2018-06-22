@@ -78,7 +78,7 @@ ListenChar(2); % don't print keypresses to screen
 Screen('Preference', 'SkipSyncTests', 1); % use if VBL fails; use this setting on the laptop
 %Screen('Preference', 'VisualDebugLevel',3);
 
-HideCursor; % Comment out for debugging
+if debugging ~= 1; HideCursor; end
 
 % Set screen number
 %screenNum=max(Screen('Screens'));
@@ -86,13 +86,26 @@ screenNum=0;
 
 % Set screen size and parameters
 if debugging == 1
-    [w, rect] = Screen('OpenWindow',screenNum, [], [0 0 480 300]);
+    [w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960/2 600/2]);
 else 
     [w, rect] = Screen('OpenWindow',screenNum);
 end
 
 ctr = [rect(3)/2, rect(4)/2]; 
 ifi = Screen('GetFlipInterval', w);
+
+% Specify accepted responses
+if inMRI == 1
+    lookKey = '5';
+    regKey = '6';
+    choiceKeys = '56';
+    rateKeys = '5678';
+else
+    lookKey = '1';
+    regKey = '2';
+    choiceKeys = '12';
+    rateKeys = '1234';
+end
 
 % Save parameters in PTBParams structure
 PTBParams.win = w;
@@ -114,6 +127,11 @@ PTBParams.ssnid = ssnid;
 PTBParams.keys = initKeys(inMRI, debugging);
 PTBParams.inMRI = inMRI;
 PTBParams.(char(runNum)).runid = runid;
+PTBParams.debugging = debugging;
+PTBParams.lookKey = lookKey;
+PTBParams.regKey = regKey;
+PTBParams.choiceKeys = choiceKeys;
+PTBParams.rateKeys = rateKeys;
 
 % Save PTBParams structure
 datafile = fullfile(homepath, 'output', [study subjid], ['PTBParams.',subjid,'.',ssnid,'.mat']);

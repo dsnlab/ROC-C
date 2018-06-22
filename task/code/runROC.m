@@ -1,7 +1,6 @@
 %% Regulation of Craving task %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Author: Dani Cosme
-% Last Modified: 03-01-2018
 %
 % Description: This script runs the task. You will be prompted to specify
 % which version of the task you'd like to run (MRI, behavioral). 
@@ -24,14 +23,17 @@ rng('shuffle')
 %% Set dropbox path for copying
 dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
 
-%% Load trial and subject condition info
-% Load trial condition order info (design created using the CAN lab GA)
-% https://github.com/UOSAN/CanLabCore_GA/tree/master/SAN_GAs/DEV
-%% UPDATE FOR MRI %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-order = [repelem({'LOOK', 'REGULATE'}, 2), repelem({'CHOOSE'},6)];
-blockOrder = order(randperm(length(order)));
+%% Specify block order
+% MRI block order was determined by randomly permuting orders with no more
+% than 2 blocks of the same condition in a row
+if PTBParams.inMRI == 1
+    load(fullfile(homepath,'input', sprintf('blockOrder_%s', runNum)));
+else
+    order = [repelem({'LOOK', 'REGULATE'}, 2), repelem({'CHOOSE'},6)];
+    blockOrder = order(randperm(length(order)));
+end
+
 trialOrder = repelem(blockOrder, 3);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Load subject condition info
 subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subjid, PTBParams.ssnid);
@@ -39,7 +41,7 @@ subInput = sprintf('%sinput/%s%s_%s_condinfo.mat',homepath,study,PTBParams.subji
 if exist(subInput)
     load(subInput);
 else
-    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStimROC.m',subInput);
+    error('Subject input file (%s) does not exist. \nPlease ensure you have run runGetStim.m',subInput);
 end
 
 %% Define image order based on trial and condition info
@@ -101,15 +103,25 @@ Food = 1:length(trialOrder);
 
 %% Load jitter
 if PTBParams.inMRI == 1
-    load(fullfile(homepath,'input','jitter.mat'))
+    load(fullfile(homepath,'input','jitters.mat'));
+    JitterBlock = Shuffle(JitterBlock);
+    JitterCue = Shuffle(JitterCue);
+    Jitter = Shuffle(Jitter);
 else
     Jitter = repelem(2,length(trialOrder)); %2s fixation for behavioral sessions
 end
 
 % Check to make sure the number of trials and jitter is the same
-if length(Jitter) < length(trialOrder)
-    error('There are not enough jitter trials allocated. \nThere are %d jitters and %d trials. \nCheck jitter file %s and consider rerunning runJitter.m', ...
-        length(Jitter), length(trialOrder), fullfile(homepath,'input','jitter.mat'))
+if PTBParams.inMRI == 1
+    if length(Jitter) + length(JitterBlock) < length(trialOrder)
+        error('There are not enough jitter trials allocated. \nThere are %d jitters and %d trials. \nCheck jitter file %s and consider rerunning runJitter.m', ...
+            length(Jitter) + length(JitterBlock), length(trialOrder), fullfile(homepath,'input','jitter.mat'))
+    end
+else
+    if length(Jitter) < length(trialOrder)
+        error('There are not enough jitter trials allocated. \nThere are %d jitters and %d trials. \nCheck jitter file %s and consider rerunning runJitter.m', ...
+            length(Jitter), length(trialOrder), fullfile(homepath,'input','jitter.mat'))
+    end
 end
 
 %% Initialize keys
@@ -145,10 +157,15 @@ posRate2_x = 5.4*PTBParams.rect(3)/8;
 
 % Define trial and wait times
 trial = 1;
-fixCue = 2; 
+ITItrial = 1;
+if PTBParams.inMRI == 1
+    fixRatings = .5;
+else
+    fixRatings = 1;
+end
 fixWait = 2;
-fixRatings = 1;
 previewWait = 2;
+cueWait = 2;
 foodWait = 6;
 ratingWait = 2.5;
 extraWait = .5; % collect responses for an additional 500 ms
@@ -198,6 +215,9 @@ for block = 1:length(blockOrder)
     PreviewOn = Screen(PTBParams.win,'Flip'); 
     previewOnset = PreviewOn-StartTime;
     WaitSecs(previewWait);
+    if PTBParams.debugging == 1
+        if trial > 1; fprintf('block ITI dur = %.1f, ITI = %.1f\n', previewOnset - itiOnset, ITI); end
+    end
 
     % Draw block cue
     Screen(PTBParams.win,'TextSize',round(.4*PTBParams.ctr(2)));
@@ -210,37 +230,40 @@ for block = 1:length(blockOrder)
     cueOn = Screen(PTBParams.win,'Flip');
     
     % Collect cue response
-    if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-        [respCue, rtCue] = collectResponse(fixCue,0,'56');
-    else
-        [respCue, rtCue] = collectResponse(fixCue,0,'12');
-    end
+    [respCue, rtCue] = collectResponse(cueWait,0,PTBParams.choiceKeys);
     cueOnset = cueOn-StartTime;
     previewDuration = (cueOn-StartTime)-previewOnset;
+    if PTBParams.debugging == 1; fprintf('preview dur = %.1f\n', previewDuration); end
+    
+    % Specify fixation cue duration
+    if PTBParams.inMRI == 1
+        fixCue = JitterCue(block);
+    else
+        fixCue = 2;
+    end
     
     % Draw fixation and collect responses that occur after cue period
     DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
     fixOn = Screen(PTBParams.win,'Flip');
     fixOnset = fixOn-StartTime;
     if strcmp(respCue, 'NULL')
-        if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-            [respCue, rtCue] = collectResponse(fixWait,0,'56');
-            rtCue = rtCue + fixCue;
-        else
-            [respCue, rtCue] = collectResponse(fixWait,0,'12');
-            rtCue = rtCue + fixCue;
-        end
+        [respCue, rtCue] = collectResponse(fixCue,0,PTBParams.choiceKeys);
+        rtCue = rtCue + cueWait;
+    else
+        WaitSecs(fixCue);
     end
+    if PTBParams.debugging == 1; fprintf('selected:  %s, %.2f\n', respCue, rtCue); end
     
     % Change color for choose trials based on selection
-    if strcmp(cue,'CHOOSE') && strcmp(respCue,'1')
+    if strcmp(cue,'CHOOSE') && (strcmp(respCue,'1') || strcmp(respCue,'5'))
         color = PTBParams.green;
-    elseif strcmp(cue,'CHOOSE') && strcmp(respCue,'2')
+    elseif strcmp(cue,'CHOOSE') && (strcmp(respCue,'2') || strcmp(respCue,'6'))
         color = PTBParams.red;
     else
         color = color;
     end
     cueDuration = (fixOn-StartTime)-cueOnset;
+    if PTBParams.debugging == 1; fprintf('cue dur = %.1f\n', cueDuration); end
         
     % Run trials within block
     for blockTrial = 1:blockSize %num trials
@@ -249,12 +272,20 @@ for block = 1:length(blockOrder)
         % Show food, fixation, and craving ratings
         showFood
         
+        % Display craving rating
+        Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+        DrawFormattedText(PTBParams.win,'Desire to eat?','center',posCue_y,PTBParams.white);
+        Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+        DrawFormattedText(PTBParams.win,'no desire',.65*posRate1_x,posPress_y,PTBParams.blue);
+        DrawFormattedText(PTBParams.win,'strong desire',.97*posRate2_x,posPress_y,PTBParams.blue);
+        DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
+        ratingOn = Screen(PTBParams.win,'Flip');
+        ratingOnset = ratingOn-StartTime;
+        if PTBParams.debugging == 1; fprintf('fixRating dur = %.1f\n', ratingOnset - fixRatingOnset); end
+        
         % Collect craving rating responses
-        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
-        else
-            [respRating, rtRating] = collectResponse(ratingWait,0,'1234');
-        end
+        [respRating, rtRating] = collectResponse(ratingWait,0,PTBParams.rateKeys);
+
  
         % Draw effort ratings
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
@@ -266,58 +297,54 @@ for block = 1:length(blockOrder)
         effortOn = Screen(PTBParams.win,'Flip');
         ratingOffset = effortOn-StartTime;
         ratingDuration = ratingOffset-ratingOnset;
+        if PTBParams.debugging == 1; fprintf('rating dur = %.1f\n', ratingDuration); end
         
         % If no craving rating response, continue to collect craving
         % response for an additional 500 ms
         if strcmp(respRating, 'NULL')
-            if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-                [respRating, rtRating] = collectResponse(extraWait,0,'5678');
-                rtRating = rtRating + ratingWait;
-            else
-                [respRating, rtRating] = collectResponse(extraWait,0,'1234');
-                rtRating = rtRating + ratingWait;
-            end
+            [respRating, rtRating] = collectResponse(extraWait,0,PTBParams.rateKeys);
+            rtRating = rtRating + ratingWait;
             
-            % Collect effort rating responses for 2000 ms
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respEffort, rtEffort] = collectResponse(effortWaitShort,0,'5678');
-                rtEffort = rtEffort + extraWait;
-            else
-                [respEffort, rtEffort] = collectResponse(effortWaitShort,0,'1234');
-                rtEffort = rtEffort + extraWait;
-            end
+        % Collect effort rating responses for 2000 ms
+            [respEffort, rtEffort] = collectResponse(effortWaitShort,0,PTBParams.rateKeys);
+            rtEffort = rtEffort + extraWait;
         else
-            % If there is a craving rating response, collect effort rating
-            % responses for 2500 ms
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respEffort, rtEffort] = collectResponse(effortWait,0,'5678');
-            else
-                [respEffort, rtEffort] = collectResponse(effortWait,0,'1234');
-            end
+        % If there is a craving rating response, collect effort rating
+        % responses for 2500 ms
+            [respEffort, rtEffort] = collectResponse(effortWait,0,PTBParams.rateKeys);
         end
-            
+        if PTBParams.debugging == 1; fprintf('selected:  %s, %.2f\n', respRating, rtRating); end
+        
         % Get effort timing
         effortOff = GetSecs;
         effortOnset = effortOn-StartTime;
         effortOffset = effortOff-StartTime;
         effortDuration = effortOffset-effortOnset;
+        if PTBParams.debugging == 1; fprintf('effort dur = %.1f\n', effortDuration); end
         
-        % Draw fixation after first and second trials
-        %if blockTrial < blockSize
-            DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
-            Screen(PTBParams.win,'Flip');
-        %end
+        % Define ITI
+        if PTBParams.inMRI == 1 && blockTrial < blockSize
+            ITI = Jitter(ITItrial)+3;
+        elseif PTBParams.inMRI == 1 && blockTrial == blockSize
+            ITI = JitterBlock(block);
+        else
+            ITI = Jitter(trial);
+        end
+        
+        % Draw ITI fixation
+        DrawFormattedText(PTBParams.win,'+','center','center',PTBParams.white);
+        itiOn = Screen(PTBParams.win,'Flip');
+        itiOnset = itiOn - StartTime;
         
         % If no effort rating response, continue to collect responses 
         if strcmp(respEffort, 'NULL')
-            if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-                [respEffort, rtEffort] = collectResponse(extraWait,0,'5678');
-                rtEffort = rtEffort + effortWait;
-            else
-                [respEffort, rtEffort] = collectResponse(extraWait,0,'1234');
-                rtEffort = rtEffort + effortWait;
-            end
+            [respEffort, rtEffort] = collectResponse(extraWait,0,PTBParams.rateKeys);
+            rtEffort = rtEffort + effortWait;
+            WaitSecs(ITI-extraWait);
+        else
+            WaitSecs(ITI);
         end
+        if PTBParams.debugging == 1; fprintf('selected:  %s, %.2f\n', respEffort, rtEffort); end
         
         % Log data in .mat file
         logData(datafile,runNum,trial,ITI, ...
@@ -329,6 +356,12 @@ for block = 1:length(blockOrder)
         
         % Update trial number
         trial=trial+1;
+        
+        % Update ITI trial number
+        if blockTrial < blockSize
+            ITItrial = ITItrial + 1;
+        end
+
     end
 end
 
@@ -336,24 +369,24 @@ end
 KbQueueRelease;
 
 % Wait for 2s
-WaitSecs(2);
+WaitSecs(6); %2
 
 % Show run rummary for 4s
 load(datafile)
 idxs = find(strcmp(Data.(char(runNum)).cond, 'CHOOSE'));
-nLook = sum(strcmp(Data.(char(runNum)).respCue(idxs), '1'))/blockSize;
-nRegulate = sum(strcmp(Data.(char(runNum)).respCue(idxs), '2'))/blockSize;
+nLook = sum(strcmp(Data.(char(runNum)).respCue(idxs), PTBParams.lookKey))/blockSize;
+nRegulate = sum(strcmp(Data.(char(runNum)).respCue(idxs), PTBParams.regKey))/blockSize;
 posPress2_x = 5.35*PTBParams.rect(3)/8;
 
-Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'Run summary for choose sets:','center',posCue_y,PTBParams.white);
-Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
-DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
-DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red);
-DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
-Screen(PTBParams.win,'Flip'); 
-WaitSecs(4);
+% Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+% DrawFormattedText(PTBParams.win,'Run summary for choose sets:','center',posCue_y,PTBParams.white);
+% Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
+% DrawFormattedText(PTBParams.win,'LOOK',posPress1_x,posPress_y,PTBParams.green);
+% DrawFormattedText(PTBParams.win,['\n\n',num2str(nLook)],posNum1_x,posNum_y,PTBParams.white);
+% DrawFormattedText(PTBParams.win,'REGULATE',posPress2_x,posPress_y,PTBParams.red);
+% DrawFormattedText(PTBParams.win,['\n\n',num2str(nRegulate)],posNum2_x,posNum_y,PTBParams.white);
+% Screen(PTBParams.win,'Flip'); 
+% WaitSecs(4);
 
 % Log end time
 EndTime = GetSecs-StartTime;
@@ -363,13 +396,6 @@ logData(datafile,runNum,1,EndTime);
 DrawFormattedText(PTBParams.win,'The task is now complete.','center','center',PTBParams.white);
 Screen(PTBParams.win,'Flip'); 
 WaitSecs(4);
-
-%% Close screen
-if ~exist('sprout')
-    % Housekeeping after the party
-    Screen('CloseAll');
-    ListenChar(0);
-end
 
 %% Save as .csv and copy files to dropbox
 subCode = sprintf('%s%s',study,PTBParams.subjid);
@@ -383,16 +409,24 @@ writetable(toWrite, outputFile, 'WriteVariableNames', true);
 if ~exist(subDir)
     mkdir(subDir);
     copyfile(sprintf('output/%s',subCode), subDir);
-    disp(sprintf('Output files copied to %s',subDir));
+    fprintf('Output files copied to %s\n',subDir);
 else
     copyfile(sprintf('output/%s/',subCode), subDir);
-    disp(sprintf('Output files copied to %s',subDir));
+    fprintf('Output files copied to %s\n',subDir);
 end
 
 %% Print run summary to command window
 disp('------------------------------');
-disp(sprintf('Number of look choices = %d', nLook));
-disp(sprintf('Number of regulate choices = %d', nRegulate));
+fprintf('Number of look choices = %d\n', nLook);
+fprintf('Number of regulate choices = %d\n', nRegulate);
 disp('------------------------------');
 
-EndTime
+if PTBParams.debugging == 1; fprintf('Total time = %.2f\n', EndTime); end
+
+
+%% Close screen
+if ~exist('sprout')
+    % Housekeeping after the party
+    Screen('CloseAll');
+    ListenChar(0);
+end

@@ -12,6 +12,9 @@ cd(homepath);
 clear all; close all; Screen('CloseAll'); 
 homepath = [pwd '/'];
 
+%% Specify whether debugging
+debugging = 1;
+
 %% Get study and subject info and whether MRI or behavioral session
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
 
@@ -67,7 +70,7 @@ PTBParams.red = [252 3 8];
 PTBParams.gray = (WhiteIndex(w) + BlackIndex(w))/2;
 PTBParams.ifi = ifi;
 PTBParams.homepath = homepath;
-PTBParams.keys = initKeys(inMRI);
+PTBParams.keys = initKeys(inMRI, debugging);
 PTBParams.inMRI = inMRI;
 PTBParams.subjid = subjid;
 PTBParams.ssnid = ssnid;
