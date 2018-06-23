@@ -128,6 +128,7 @@ end
 inputDevice = PTBParams.keys.deviceNum;
 
 %% Load task instructions based on MRI or behavioral session
+Screen(PTBParams.win,'TextSize',50);
 if PTBParams.inMRI == 1
     DrawFormattedText(PTBParams.win,'Calibrating scanner.\n\n Please hold very still.','center','center',PTBParams.white);
 else 
