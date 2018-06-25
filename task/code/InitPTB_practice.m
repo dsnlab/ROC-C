@@ -13,7 +13,7 @@ clear all; close all; Screen('CloseAll');
 homepath = [pwd '/'];
 
 %% Specify whether debugging
-debugging = 1;
+debugging = 0;
 
 %% Get study and subject info and whether MRI or behavioral session
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');

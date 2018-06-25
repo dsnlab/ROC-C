@@ -43,17 +43,21 @@ if length(varargin) >= 3
     allowedKeys = varargin{3};
 end
 
+if length(varargin) >= 4
+    inputDevice = varargin{4};
+end
+
 if ListenTime == Inf && moveOn ~= 1
     error('Infinite loop: You asked me to wait forever, even AFTER the subject has responded!')
 end
 
 % Start queue
-KbQueueCreate;
-KbQueueStart;
+KbQueueCreate(inputDevice);
+KbQueueStart(inputDevice);
 
 if isempty(allowedKeys)
     while (GetSecs() - StartWaiting) < ListenTime
-        [pressed, firstPress] = KbQueueCheck;
+        [pressed, firstPress] = KbQueueCheck(inputDevice);
         if pressed
             if chose == 0
               RT = firstPress(find(firstPress)) - StartWaiting;
@@ -71,7 +75,7 @@ if isempty(allowedKeys)
     end    
 else
     while (GetSecs() - StartWaiting) < ListenTime
-        [pressed, firstPress] = KbQueueCheck;
+        [pressed, firstPress] = KbQueueCheck(inputDevice);
         if pressed
             if chose == 0
               RT = firstPress(find(firstPress)) - StartWaiting;

@@ -71,7 +71,7 @@ if length(Jitter) < length(trialOrder)
 end
 
 %% Initialize keys
-inputDevice = PTBParams.keys.deviceNum;
+inputDevice = PTBParams.keys.bbox;
 
 %% Load task instructions based on MRI or behavioral session
 if PTBParams.inMRI == 1
@@ -166,9 +166,9 @@ for block = 1:length(blockOrder)
     
     % Collect cue response
     if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-        [respCue, rtCue] = collectResponse(cueWait,0,'56');
+        [respCue, rtCue] = collectResponse(cueWait,0,'56',inputDevice);
     else
-        [respCue, rtCue] = collectResponse(cueWait,0,'12');
+        [respCue, rtCue] = collectResponse(cueWait,0,'12',inputDevice);
     end
     cueOnset = cueOn-StartTime;
     previewDuration = (cueOn-StartTime)-previewOnset;
@@ -181,12 +181,12 @@ for block = 1:length(blockOrder)
     fixOnset = fixOn-StartTime;
     if strcmp(respCue, 'NULL')
         if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-            [respCue, rtCue] = collectResponse(fixWait,0,'56');
+            [respCue, rtCue] = collectResponse(fixWait,0,'56',inputDevice);
         else
-            [respCue, rtCue] = collectResponse(fixWait,0,'12');
+            [respCue, rtCue] = collectResponse(fixWait,0,'12',inputDevice);
         end
     end
-    
+            
     % Change color for choose trials based on selection
     if strcmp(cue,'CHOOSE') && (strcmp(respCue,'1') || strcmp(respCue,'5'))
         color = PTBParams.green;
@@ -206,9 +206,9 @@ for block = 1:length(blockOrder)
         
         % Collect craving rating responses
         if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respRating, rtRating] = collectResponse(ratingWait,0,'5678');
+            [respRating, rtRating] = collectResponse(ratingWait,0,'5678',inputDevice);
         else
-            [respRating, rtRating] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
+            [respRating, rtRating] = collectResponse(ratingWait,0,'1234',inputDevice); %Changing the first argument changes the time the bid is on the screen
         end
  
         % Draw effort ratings
@@ -222,9 +222,9 @@ for block = 1:length(blockOrder)
         
         % Collect effort rating responses
         if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678');
+            [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678',inputDevice);
         else
-            [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234'); %Changing the first argument changes the time the bid is on the screen
+            [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234',inputDevice); %Changing the first argument changes the time the bid is on the screen
         end
             
         % Draw fixation after first and second trials

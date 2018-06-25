@@ -125,7 +125,7 @@ else
 end
 
 %% Initialize keys
-inputDevice = PTBParams.keys.deviceNum;
+inputDevice = PTBParams.keys.bbox;
 
 %% Load task instructions based on MRI or behavioral session
 if PTBParams.inMRI == 1
@@ -230,7 +230,7 @@ for block = 1:length(blockOrder)
     cueOn = Screen(PTBParams.win,'Flip');
     
     % Collect cue response
-    [respCue, rtCue] = collectResponse(cueWait,0,PTBParams.choiceKeys);
+    [respCue, rtCue] = collectResponse(cueWait,0,PTBParams.choiceKeys,inputDevice);
     cueOnset = cueOn-StartTime;
     previewDuration = (cueOn-StartTime)-previewOnset;
     if PTBParams.debugging == 1; fprintf('preview dur = %.1f\n', previewDuration); end
@@ -247,7 +247,7 @@ for block = 1:length(blockOrder)
     fixOn = Screen(PTBParams.win,'Flip');
     fixOnset = fixOn-StartTime;
     if strcmp(respCue, 'NULL')
-        [respCue, rtCue] = collectResponse(fixCue,0,PTBParams.choiceKeys);
+        [respCue, rtCue] = collectResponse(fixCue,0,PTBParams.choiceKeys,inputDevice);
         rtCue = rtCue + cueWait;
     else
         WaitSecs(fixCue);
@@ -284,7 +284,7 @@ for block = 1:length(blockOrder)
         if PTBParams.debugging == 1; fprintf('fixRating dur = %.1f\n', ratingOnset - fixRatingOnset); end
         
         % Collect craving rating responses
-        [respRating, rtRating] = collectResponse(ratingWait,0,PTBParams.rateKeys);
+        [respRating, rtRating] = collectResponse(ratingWait,0,PTBParams.rateKeys,inputDevice);
 
  
         % Draw effort ratings
@@ -302,16 +302,16 @@ for block = 1:length(blockOrder)
         % If no craving rating response, continue to collect craving
         % response for an additional 500 ms
         if strcmp(respRating, 'NULL')
-            [respRating, rtRating] = collectResponse(extraWait,0,PTBParams.rateKeys);
+            [respRating, rtRating] = collectResponse(extraWait,0,PTBParams.rateKeys,inputDevice);
             rtRating = rtRating + ratingWait;
             
         % Collect effort rating responses for 2000 ms
-            [respEffort, rtEffort] = collectResponse(effortWaitShort,0,PTBParams.rateKeys);
+            [respEffort, rtEffort] = collectResponse(effortWaitShort,0,PTBParams.rateKeys,inputDevice);
             rtEffort = rtEffort + extraWait;
         else
         % If there is a craving rating response, collect effort rating
         % responses for 2500 ms
-            [respEffort, rtEffort] = collectResponse(effortWait,0,PTBParams.rateKeys);
+            [respEffort, rtEffort] = collectResponse(effortWait,0,PTBParams.rateKeys,inputDevice);
         end
         if PTBParams.debugging == 1; fprintf('selected:  %s, %.2f\n', respRating, rtRating); end
         
@@ -338,7 +338,7 @@ for block = 1:length(blockOrder)
         
         % If no effort rating response, continue to collect responses 
         if strcmp(respEffort, 'NULL')
-            [respEffort, rtEffort] = collectResponse(extraWait,0,PTBParams.rateKeys);
+            [respEffort, rtEffort] = collectResponse(extraWait,0,PTBParams.rateKeys,inputDevice);
             rtEffort = rtEffort + effortWait;
             WaitSecs(ITI-extraWait);
         else
