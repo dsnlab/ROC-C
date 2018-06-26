@@ -26,14 +26,14 @@ if inMRI == 1
             keys.bbox = deviceCount;
             keys.trigger = 52; % trigger pulse / TR signal key ('`') for LCNI scanner
             fprintf('button box detected\n using device #%d: %s\n',deviceCount,devices(deviceCount).product);
-%             break
-%           % MacBook laptop setup has the usagename 'Keyboard' and the product 'Apple Internal Keyboard / Trackpad'
-%           elseif debugging == 1 && (strcmp(devices(deviceCount).usageName,'Keyboard') && ...
-%                  strcmp(devices(deviceCount).product,'Apple Internal Keyboard / Trackpad'))
-%             keys.bbox = deviceCount;
-%             keys.trigger = KbName('SPACE'); % use spacebar as KbTrigger
-%             fprintf('Debugging for scanner #%d: internal %s\n',deviceCount,devices(deviceCount).usageName);
-%             break
+            break
+          % MacBook laptop setup has the usagename 'Keyboard' and the product 'Apple Internal Keyboard / Trackpad'
+          elseif debugging == 1 && (strcmp(devices(deviceCount).usageName,'Keyboard') && ...
+                 strcmp(devices(deviceCount).product,'Apple Internal Keyboard / Trackpad'))
+            keys.bbox = deviceCount;
+            keys.trigger = KbName('SPACE'); % use spacebar as KbTrigger
+            fprintf('Debugging for scanner #%d: internal %s\n',deviceCount,devices(deviceCount).usageName);
+            break
           end
     end
 else

@@ -24,7 +24,7 @@ while checksubjid == 1
     % set prompt info and default answers
     prompt={'Study code'; 'Subject number (3 digits)'; 'Run number (1-3)'; 'MRI session? (0 = no, 1 = yes)'};
     name='Subject Info';
-    defAns={'HL'; '999'; ''; ''};
+    defAns={'FP'; '999'; ''; ''};
     options.WindowStyle = 'normal';
 
     % open dialog box
