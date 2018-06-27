@@ -135,6 +135,9 @@ commandwindow;
 %change this to 0 to fill whole screen
 DEBUG=0;
 
+%hide cursor
+HideCursor;
+
 %set up the screen and dimensions
 
 %list all the screens, then just pick the last one in the list (if you have
