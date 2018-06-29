@@ -165,8 +165,8 @@ for block = 1:length(blockOrder)
     cueOn = Screen(PTBParams.win,'Flip');
     
     % Collect cue response
-    if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-        [respCue, rtCue] = collectResponse(cueWait,0,'56',inputDevice);
+    if PTBParams.inMRI == 1 %In the scanner use 67, if outside use 12
+        [respCue, rtCue] = collectResponse(cueWait,0,'67',inputDevice);
     else
         [respCue, rtCue] = collectResponse(cueWait,0,'12',inputDevice);
     end
@@ -180,8 +180,8 @@ for block = 1:length(blockOrder)
     fixOn = Screen(PTBParams.win,'Flip');
     fixOnset = fixOn-StartTime;
     if strcmp(respCue, 'NULL')
-        if PTBParams.inMRI == 1 %In the scanner use 56, if outside use 12
-            [respCue, rtCue] = collectResponse(fixWait,0,'56',inputDevice);
+        if PTBParams.inMRI == 1 %In the scanner use 67, if outside use 12
+            [respCue, rtCue] = collectResponse(fixWait,0,'67',inputDevice);
         else
             [respCue, rtCue] = collectResponse(fixWait,0,'12',inputDevice);
         end
@@ -205,8 +205,8 @@ for block = 1:length(blockOrder)
         showFood_practice
         
         % Collect craving rating responses
-        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respRating, rtRating] = collectResponse(ratingWait,0,'5678',inputDevice);
+        if PTBParams.inMRI == 1 %In the scanner use 6789, if outside use 1234
+            [respRating, rtRating] = collectResponse(ratingWait,0,'6789',inputDevice);
         else
             [respRating, rtRating] = collectResponse(ratingWait,0,'1234',inputDevice); %Changing the first argument changes the time the bid is on the screen
         end
@@ -221,8 +221,8 @@ for block = 1:length(blockOrder)
         ratingOff = Screen(PTBParams.win,'Flip');
         
         % Collect effort rating responses
-        if PTBParams.inMRI == 1 %In the scanner use 5678, if outside use 1234
-            [respEffort, rtEffort] = collectResponse(ratingWait,0,'5678',inputDevice);
+        if PTBParams.inMRI == 1 %In the scanner use 6789, if outside use 1234
+            [respEffort, rtEffort] = collectResponse(ratingWait,0,'6789',inputDevice);
         else
             [respEffort, rtEffort] = collectResponse(ratingWait,0,'1234',inputDevice); %Changing the first argument changes the time the bid is on the screen
         end

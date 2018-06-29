@@ -96,10 +96,10 @@ ifi = Screen('GetFlipInterval', w);
 
 % Specify accepted responses
 if inMRI == 1
-    lookKey = '5';
-    regKey = '6';
-    choiceKeys = '56';
-    rateKeys = '5678';
+    lookKey = '6';
+    regKey = '7';
+    choiceKeys = '67';
+    rateKeys = '6789';
 else
     lookKey = '1';
     regKey = '2';
