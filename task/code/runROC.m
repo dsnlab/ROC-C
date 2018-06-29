@@ -256,9 +256,9 @@ for block = 1:length(blockOrder)
     if PTBParams.debugging == 1; fprintf('selected:  %s, %.2f\n', respCue, rtCue); end
     
     % Change color for choose trials based on selection
-    if strcmp(cue,'CHOOSE') && (strcmp(respCue,'1') || strcmp(respCue,'5'))
+    if strcmp(cue,'CHOOSE') && strcmp(respCue,PTBParams.lookKey)
         color = PTBParams.green;
-    elseif strcmp(cue,'CHOOSE') && (strcmp(respCue,'2') || strcmp(respCue,'6'))
+    elseif strcmp(cue,'CHOOSE') && strcmp(respCue,PTBParams.regKey)
         color = PTBParams.red;
     else
         color = color;
