@@ -1,2 +1,5 @@
 .DS_Store
 task/stimuli/run*
+task/output
+task/ratings
+task/input/*condinfo.mat
