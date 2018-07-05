@@ -3,3 +3,4 @@ task/stimuli/run*
 task/output
 task/ratings
 task/input/*condinfo.mat
+task/stimuli/practice
