@@ -21,7 +21,7 @@ rng('default')
 rng('shuffle')
 
 %% Set dropbox path for copying
-dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output';
+dropboxDir = '~/Dropbox (PfeiBer Lab)/FreshmanProject/Tasks/ROC-C/output/HL_2019';
 
 %% Specify block order
 % MRI block order was determined by randomly permuting orders with no more
@@ -165,8 +165,8 @@ else
     fixRatings = 1;
 end
 fixWait = 2;
-previewWait = 4;
-cueWait = 4;
+previewWait = 2;
+cueWait = 2;
 foodWait = 6;
 ratingWait = 2.5;
 extraWait = .5; % collect responses for an additional 500 ms
@@ -292,8 +292,8 @@ for block = 1:length(blockOrder)
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
         DrawFormattedText(PTBParams.win,'How hard?','center',posCue_y,PTBParams.white);
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-        DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.pink  );
-        DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.pink);
+        DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.teal  );
+        DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
         DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
         effortOn = Screen(PTBParams.win,'Flip');
         ratingOffset = effortOn-StartTime;

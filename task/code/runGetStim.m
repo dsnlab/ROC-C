@@ -32,7 +32,7 @@ ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
 % set prompt info and default answers
 prompt = {'Study code'; 'Subject number (3 digits)'};
 name = 'Subject Info';
-defAns = {'FP'; '999'};
+defAns = {'HL'; '999'};
 options.WindowStyle = 'normal';
 
 % open dialog box

@@ -24,7 +24,7 @@ while checksubjid == 1
     % set prompt info and default answers
     prompt={'Study code'; 'Subject number (3 digits)'; 'Run number (1-3)'; 'MRI session? (0 = no, 1 = yes)'};
     name='Subject Info';
-    defAns={'FP'; '999'; ''; ''};
+    defAns={'HL'; '999'; ''; '0'};
     options.WindowStyle = 'normal';
 
     % open dialog box
@@ -117,6 +117,7 @@ PTBParams.yellow = [240 189 0];
 PTBParams.green = [142 166 4];
 PTBParams.blue = [0 161 228];
 PTBParams.teal = [77 161 169];
+PTBParams.pink = [202 21 81];
 PTBParams.red = [252 3 8];
 PTBParams.gray = (WhiteIndex(w) + BlackIndex(w))/2;
 PTBParams.ifi = ifi;

@@ -95,13 +95,14 @@ posNum1_x = posPress1_x+(PTBParams.rect(3)/16);
 posNum2_x = posPress2_x+(PTBParams.rect(3)/14);
 posNum_y = 2*PTBParams.rect(4)/3.5;
 posRate1_x = PTBParams.rect(3)/8;
-posRate2_x = 5.4*PTBParams.rect(3)/8;
+posRate2_x = 5.4*PTBParams.rect(3)/8;sca
+
 
 % define trial and wait times
 trial = 1;
-cueWait = 2;
+previewWait = 4;
+cueWait = 4;
 fixWait = 2;
-previewWait = 2;
 foodWait = 6;
 if PTBParams.inMRI == 1
     fixRatings = .5;
@@ -215,8 +216,8 @@ for block = 1:length(blockOrder)
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
         DrawFormattedText(PTBParams.win,'How hard?','center',posCue_y,PTBParams.white);
         Screen(PTBParams.win,'TextSize',round(.15*PTBParams.ctr(2)));
-        DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.teal  );
-        DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.teal);
+        DrawFormattedText(PTBParams.win,'not hard',.75*posRate1_x,posPress_y,PTBParams.pink  );
+        DrawFormattedText(PTBParams.win,'very hard',1.05*posRate2_x,posPress_y,PTBParams.pink);
         DrawFormattedText(PTBParams.win,'\n\n1    -------    2    -------    3    -------   4','center',posPress_y,PTBParams.white);
         ratingOff = Screen(PTBParams.win,'Flip');
         
