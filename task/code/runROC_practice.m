@@ -95,7 +95,7 @@ posNum1_x = posPress1_x+(PTBParams.rect(3)/16);
 posNum2_x = posPress2_x+(PTBParams.rect(3)/14);
 posNum_y = 2*PTBParams.rect(4)/3.5;
 posRate1_x = PTBParams.rect(3)/8;
-posRate2_x = 5.4*PTBParams.rect(3)/8;sca
+posRate2_x = 5.4*PTBParams.rect(3)/8;
 
 
 % define trial and wait times

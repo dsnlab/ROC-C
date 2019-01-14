@@ -13,7 +13,7 @@ clear all; close all; Screen('CloseAll');
 homepath = [pwd '/'];
 
 %% Specify whether debugging
-debugging = 0;
+debugging = 1;
 
 %% Get study and subject info and whether MRI or behavioral session
 ssnid = '1'; %removed user input: input('Session number (1-5):  ', 's');
@@ -43,15 +43,18 @@ ListenChar(2); % don't print keypresses to screen
 Screen('Preference', 'SkipSyncTests', 1); % use if VBL fails; use this setting on the laptop
 %Screen('Preference', 'VisualDebugLevel',3);
 
-HideCursor; %comment out for testing only
+if debugging ~= 1; HideCursor; end
 
 % Set screen number
 %screenNum=max(Screen('Screens'));
 screenNum=0;
 
 % Set screen size and parameters
-[w, rect] = Screen('OpenWindow',screenNum);
-%[w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]); %DCos 2015.06.25, Use for debugging
+if debugging == 1
+    [w, rect] = Screen('OpenWindow',screenNum, [], [0 0 960 600]);
+else 
+    [w, rect] = Screen('OpenWindow',screenNum);
+end
 
 ctr = [rect(3)/2, rect(4)/2]; 
 ifi = Screen('GetFlipInterval', w);
